@@ -1,0 +1,2 @@
+# VerusPoolHowto
+VerusCoin Pool Howto

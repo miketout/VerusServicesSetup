@@ -66,7 +66,8 @@ komodo-cli -ac_name=VRSC stop
 ```
 
 Edit the resulting `~/.komodo/VRSC/VRSC.conf` to include the parameters listed below, adapt the ones that need to be adapted.
-A resonably secure `rpcpassword` can be generated using this command: `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
+A resonably secure `rpcpassword` can be generated using this command: 
+`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
 
 ```
 server=1

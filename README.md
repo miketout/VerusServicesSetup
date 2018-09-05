@@ -484,6 +484,13 @@ Make both files executable:
 chmod +x /home/veruscoin/bin/veruscoin*
 ```
 
+From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands, you can just use them as shown below: 
+
+```
+veruscoind -daemon 1>/dev/null 2>&1
+veruscoin-cli addnode 1.2.3.4 onetry
+```
+
 ### Increase open files limit
 
 Add this to your `/etc/security/limits.conf`: 

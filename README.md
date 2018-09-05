@@ -253,3 +253,6 @@ If you completed all steps correctly, the web dashboard on your pool can be reac
   * Proxying the pool webdashboard with `nginx` or similar is recommended.
   * Check `libs/website.js` and disable unused pages (admin, key, ...)
   * Enable `logrotate` for `/home/s-nomp/.pm2/logs/s-nomp-error.log` and `/home/s-nomp/.pm2/logs/s-nomp-out.log`
+  * Use the `crontab` for `s-nomp` and `veruscoin` users to achieve 'reboot safety', delaying the pool startup by about 60s
+  * Introduce 2 scripts called `veruscoind` and `veruscoin-cli` in `/home/veruscoin/bin` to simplify wallet usage
+  * Increase open files limit in `/etc/security/limits.conf`

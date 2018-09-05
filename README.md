@@ -314,13 +314,13 @@ None of the topics below is strictly necessary, but most of them are recommended
 
 If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't go google the comic, you might have missed a laugh there!
 
-Generate a proper `/etc/ssh/moduli` like this:
+As `root`, generate a proper `/etc/ssh/moduli` like this:
 
 ```
-ssh-keygen -G "${HOME}/moduli" -b 4096
+ssh-keygen -G "/root/moduli.candidates" -b 4096
 mv /etc/ssh/moduli /etc/ssh/moduli.old
-ssh-keygen -T /etc/ssh/moduli -f "${HOME}/moduli"
-rm "${HOME}/moduli"
+ssh-keygen -T /etc/ssh/moduli -f "/root/module.candidates"
+rm "/root/moduli.candidates"
 ```
 
 Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this: 

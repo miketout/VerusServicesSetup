@@ -106,7 +106,7 @@ rpcallowip=127.0.0.1
 exportdir=/home/veruscoin/export
 
 # blocknotify
-blocknotify=/usr/bin/node /home/pool/s-nomp/scripts/cli.js blocknotify verus %s
+blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %s
 
 # if a peer jacks up more than 25 times in a row, ban it
 banscore=25

@@ -606,3 +606,11 @@ npm -g install redis-commander
 ```
 
 Consult `redis-commander --help` for more information.
+
+### Install `molly-guard`
+
+As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this: 
+
+```
+apt -y install molly-guard
+```

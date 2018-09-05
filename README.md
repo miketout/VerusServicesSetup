@@ -2,7 +2,7 @@
 
 ## Server
 
-A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores is the absolute minimum requirement.
+A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 
 ## Operating System
@@ -80,11 +80,11 @@ Because this time `STDOUT` and `STDERR` are not redirected, it will produce a lo
 komodo-cli -ac_name=VRSC getinfo
 ```
 
-When it has synced up to height, the `blocks` and `longestchain` values will be at par. While we wait for this to happen, lets continue.
+When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
 ## Redis 
 
-Switch back to the `root` account. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
+Switch back to the `root` account by typing `exit` or hitting `CTRL-D`. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
 
 ```
 bind 127.0.0.1

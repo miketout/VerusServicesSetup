@@ -84,7 +84,7 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 
 ## Redis 
 
-Switch back to the `root` account. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this:
+Switch back to the `root` account. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
 
 ```
 bind 127.0.0.1
@@ -122,7 +122,7 @@ S-NOMP and some of its dependencies will need additional packages in order to be
 apt -y install libboost-all-dev libsodium-dev
 ```
 
-Create a new user account to run S-NOMP from. Switch to that user and clone S-NOMP from hellcatz repository: 
+Create a new user account to run S-NOMP from. Switch to that user and clone S-NOMP from miketouts repository: 
 
 ```
 useradd -m -d /home/s-nomp -s /bin/bash s-nomp
@@ -151,9 +151,31 @@ cd ~/s-nomp
 perl -p -i -e 's/_blocktime = 160/_blocktime = 55/g' libs/stats.js
 ```
 
-_Here be dragons, doges and ALL \o/ the code changes needed to get the pool fee working._
+Edit the `coins/vrsc.json` to look like below. **NOTE:** including the `burnFees` parameter is the crucial key part here.
 
- 
+```
+{
+    "name": "verus",
+    "symbol": "vrsc",
+    "algorithm": "verushash",
+    "txfee": 0.0005,
+    "requireShielding": true,
+    "burnFees": true,
+
+    "explorer": {
+        "txURL": "https://explorer.veruscoin.io/tx/",
+        "blockURL": "https://explorer.veruscoin.io/block/",
+        "_comment_explorer": "This is the coin's explorer full base url for transaction and blocks i.e. (https://explorer.coin.com/tx/). The pool will automatically add the transaction id or block id at the end."
+    }
+}
+```
+
+Locate the `verushash` module directory. It either is `/home/s-nomp/node_modules/verushash` or `/home/s-nomp/node_modules/stratum_pool/node_modules/verushash`. In this directory, create a file called `index.json` containing this: 
+
+```
+module.exports = require('bindings')('verushash.node');
+```
+
 ## Configuration Instructions
 
 Shielding is required for mined VerusCoins. We will need 2 public and a z-address for this. Switch to the `veruscoin` user and generate the addresses:
@@ -180,7 +202,7 @@ komodo-cli -ac_name=VRSC z_exportkey <VerusCoin z-address>
 
 Now, switch to the `s-nomp` account. First, copy `~/s-nomp/config_example.json` to `~/s-nomp/config.json`. Edit it to reflect the changes listed below.
 
-  * Under `clustering`, set `enabled` to `false`, otherwise PM2 fails to work.
+  * Under `clustering`, set `enabled` to `false`, otherwise [PM2](http://pm2.keymetrics.io) fails to work.
   * Set `stratumHost` to the external IP or DNS name of your server.
 
 Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below. 
@@ -219,10 +241,15 @@ Switch to the `s-nomp` user. Then start the pool using `pm2`:
 
 ```
 cd ~/s-nomp
-pm2 start init.js --name s-nomp_veruscoin
+pm2 start init.js --name s-nomp
 ```
 
 Use `pm2 log` to check for S-NOMP startup errors. 
 
 If you completed all steps correctly, the web dashboard on your pool can be reached via port `8080` on the external IP or the DNS name of your server.
 
+## Further notes
+
+  * Proxying the pool webdashboard with `nginx` or similar is recommended.
+  * Check `libs/website.js` and disable unused pages (admin, key, ...)
+  * Enable `logrotate` for `/home/s-nomp/.pm2/logs/s-nomp-error.log` and `/home/s-nomp/.pm2/logs/s-nomp-out.log`

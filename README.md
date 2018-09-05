@@ -261,10 +261,10 @@ komodo-cli -ac_name=VRSC z_exportkey <VerusCoin z-address>
 
 Now, switch to the `s-nomp` account. First, copy `~/s-nomp/config_example.json` to `~/s-nomp/config.json`. Edit it to reflect the changes listed below.
 
-  * Under `clustering`, set `enabled` to `false`, otherwise [PM2](http://pm2.keymetrics.io) fails to work.
+  * Under `clustering`, set `enabled` to `false`, **otherwise [PM2](http://pm2.keymetrics.io) fails to work.**
   * Set `stratumHost` to the external IP or DNS name of your server.
 
-Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below. 
+Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itself. Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below. 
 
  * Set `enabled` to `true`.
  * Set `coin` to `vrsc.json`.
@@ -307,11 +307,229 @@ Use `pm2 log` to check for S-NOMP startup errors.
 
 If you completed all steps correctly, the web dashboard on your pool can be reached via port `8080` on the external IP or the DNS name of your server.
 
-## Further notes
+## Further considerations
 
-  * Proxying the pool webdashboard with `nginx` or similar is recommended.
-  * Check `libs/website.js` and disable unused pages (admin, key, ...)
-  * Enable `logrotate` for `/home/s-nomp/.pm2/logs/s-nomp-error.log` and `/home/s-nomp/.pm2/logs/s-nomp-out.log`
-  * Use the `crontab` for `s-nomp` and `veruscoin` users to achieve 'reboot safety', delaying the pool startup by about 60s
-  * Introduce 2 scripts called `veruscoind` and `veruscoin-cli` in `/home/veruscoin/bin` to simplify wallet usage
-  * Increase open files limit in `/etc/security/limits.conf`
+### Putting the pool behind some CDN
+
+You should consider putting the webdashboard of your pool behind some CDN. A free CloudFlare account and any domain provider that allows changing the NS records of your domain will work. If you use a DNS name to point to your stratum ip, make sure to disable proxying for it!
+
+### Reverse-proxying S-NOMP behind `nginx`
+
+As `root`, install `nginx` and enable it on boot using these commands: 
+
+```
+apt -y install nginx
+update-rc.d enable nginx
+```
+
+Create `/etc/nginx/blockuseragents.rules` with these contents: 
+
+```
+map $http_user_agent $blockedagent {
+default         0;
+~*malicious     1;
+~*bot           1;
+~*backdoor      1;
+~*crawler       1;
+~*bandit        1;
+}
+```
+
+Edit `/etc/nginx/sites-available/default` to look like this: 
+
+```
+include /etc/nginx/blockuseragents.rules;
+server {
+	if ($blockedagent) {
+		return 403;
+	}
+	if ($request_method !~ ^(GET|HEAD|POST)$) {
+		return 444;
+	}
+
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	charset utf-8;
+	root /var/www/html;
+	index index.html index.htm index.nginx-debian.html;
+
+	location / {
+		proxy_pass http://127.0.0.1:8080/;
+		proxy_set_header X-Real-IP $remote_addr;
+	}
+
+	location /admin {
+		rewrite ^/.* /stats permanent;
+	}
+
+}
+```
+
+Restart `nginx`: 
+
+```
+/etc/init.d/nginx restart
+```
+
+Switch to the `s-nomp` user, edit `/home/s-nomp/s-nomp/config.json` to bind the web interface to `127.0.0.1:8080`: 
+
+```
+[...]
+"website": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "port": 8080,
+[...]
+
+```
+
+Restart the pool: 
+
+```
+pm2 restart s-nomp
+```
+
+If you've followed the above steps correctly, your pool's webdashboard is now proxied behind nginx.
+
+### Disable unused webdashboard pages
+
+Change to the `s-nomp` account. Edit `/home/s-nomp/libs/website.js` to have the `pageFiles` array look like below: 
+
+```
+var pageFiles = {
+    'index.html': 'index',
+    'home.html': '',
+    'manual.html': 'manual',
+    'stats.html': 'stats',
+    'tbs.html': 'tbs',
+    'workers.html': 'workers',
+    'api.html': 'api',
+    'miner_stats.html': 'miner_stats',
+    'payments.html': 'payments'
+}
+```
+
+### Enable `logrotate` 
+
+As `root` user, create a file called `/etc/logrotate.d/pool` with these contents: 
+
+```
+/home/veruscoin/.komodo/VRSC/debug.log
+/home/s-nomp/.pm2/logs/veruspool-out.log
+/home/s-nomp/.pm2/logs/veruspool-error.log
+{
+  rotate 14
+  daily
+  compress
+  delaycompress
+  copytruncate
+  missingok
+  notifempty
+}
+```
+
+### Autostart using `cron`
+
+Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
+
+```
+@reboot /home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
+```
+
+Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below:
+
+```
+@reboot /bin/sleep 60 && cd /home/s-nomp/s-nomp && /usr/bin/pm2 start init.js --name s-nomp
+```
+
+### Simplify wallet usage
+
+Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this: 
+
+```
+#!/bin/bash
+OLDPWD="$(pwd)"
+cd /home/veruscoin/.komodo/VRSC
+/home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 ${@}
+cd "${OLDPWD}"
+```
+
+Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this: 
+
+```
+#!/bin/bash
+/home/veruscoin/bin/komodo-cli -ac_name=VRSC ${@}
+```
+
+Make both files executable: 
+
+```
+chmod +x /home/veruscoin/bin/veruscoin*
+```
+
+### Increase open files limit
+
+Add this to your `/etc/security/limits.conf`: 
+
+```
+* soft nofile 1048576
+* hard nofile 1048576
+```
+
+Reboot to activate the changes. Alternatively you can make sure all running processes are restarted from within a shell that has been launched _after_ the above changes were put in place.
+
+
+### Networking optimizations
+
+If your pool is expected to receive a lot of load, consider implementing below changes, all as `root`:
+
+Enable the `tcp_bbr` kernel module: 
+
+```
+modprobe tcp_bbr
+echo tcp_bbr >> /etc/modules
+```
+
+Edit your `/etc/sysctl.conf` to include below settings: 
+
+```
+vm.swappiness=1
+net.ipv4.tcp_congestion_control=bbr
+net.core.rmem_default = 1048576
+net.core.wmem_default = 1048576
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+net.ipv4.udp_rmem_min = 16384
+net.ipv4.udp_wmem_min = 16384
+net.core.netdev_max_backlog = 262144
+net.ipv4.tcp_max_orphans = 262144
+net.ipv4.tcp_max_syn_backlog = 262144
+#net.ipv4.tcp_no_metrics_save = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_max_tw_buckets = 2000000
+#net.ipv4.tcp_fin_timeout = 10
+#net.ipv4.tcp_keepalive_time = 60
+#net.ipv4.tcp_keepalive_intvl = 10
+#net.ipv4.tcp_keepalive_probes = 3
+#net.ipv4.tcp_synack_retries = 2
+#net.ipv4.tcp_syn_retries = 2
+net.ipv4.ip_local_port_range = 16001 65530
+net.core.somaxconn = 20480
+net.ipv4.tcp_low_latency = 1
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_fastopen = 3
+net.ipv4.tcp_limit_output_bytes = 131072
+```
+
+### Install `redis-commander`
+
+As `root`, install `redis-commander` like this: 
+
+```
+npm -g install redis-commander
+```
+
+Consult `redis-commander --help``` for more information.

@@ -409,6 +409,23 @@ var pageFiles = {
 }
 ```
 
+### Link to the `payments` page
+
+Change to the `s-nomp` user account. Edit `/home/s-nomp/website/index.html` to include a new link at the right position, which is somewhere in between lines `30-70`: 
+
+```
+<header>
+[...]
+    <li class="{{? it.selected === 'payments' }}pure-menu-selected{{?}}">
+        <a class="hot-swapper" href="/payments">
+            <i class="fa fa-usd"></i>&nbsp;
+            Payments
+        </a>
+    </li>
+[...]
+</header>
+```
+
 ### Enable `logrotate` 
 
 As `root` user, create a file called `/etc/logrotate.d/pool` with these contents: 
@@ -524,6 +541,13 @@ net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_limit_output_bytes = 131072
 ```
 
+Run below command to activate the changes, alternatively reboot the machine: 
+
+
+```
+sysctl -p /etc/sysctl.conf
+```
+
 ### Install `redis-commander`
 
 As `root`, install `redis-commander` like this: 
@@ -532,4 +556,4 @@ As `root`, install `redis-commander` like this:
 npm -g install redis-commander
 ```
 
-Consult `redis-commander --help``` for more information.
+Consult `redis-commander --help` for more information.

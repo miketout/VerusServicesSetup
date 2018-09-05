@@ -65,7 +65,64 @@ Let it run for a few seconds and stop it again:
 komodo-cli -ac_name=VRSC stop
 ```
 
-In the resulting `~/.komodo/VRSC/VRSC.conf`, add `listen=1`. Then start the daemon again and let it sync the blockchain: 
+Edit the resulting `~/.komodo/VRSC/VRSC.conf` to include the parameters listed below, adapt the ones that need to be adapted. A resonably secure `rpcpassword` can be generated using this command: `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
+
+```
+server=1
+listen=1
+listenonion=0
+maxconnections=256
+
+# logging related options
+logtimestamps=1
+logips=1
+shrinkdebugfile=0
+
+# how many blocks to check on startup
+checkblocks=64
+
+# indexing options
+txindex=1
+addressindex=1
+timestampindex=1
+spentindex=1
+
+# make sure ipv4 & ipv6 is used
+bind=<your public ipv4 address>
+bind=<your public ipv6 address>
+
+# rpc settings
+rpcuser=veruscoin
+rpcpassword=your-secret-veruscoin-rpc-password
+rpcport=27486
+rpcthreads=256
+rpcworkqueue=1024
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# where to store exported data
+exportdir=/home/veruscoin/export
+
+# blocknotify
+blocknotify=/usr/bin/node /home/pool/s-nomp/scripts/cli.js blocknotify verus %s
+
+# if a peer jacks up more than 25 times in a row, ban it
+banscore=25
+
+# stake if possible, although it's probably not helping much
+gen=1
+genproclimit=0
+
+# addnodes
+seednode=185.25.48.236:27485
+addnode=185.25.48.236:27487
+seednode=185.64.105.111:27485
+addnode=185.64.105.111:27487
+seednode=185.25.48.72:27485
+seednode=185.25.48.72:27487
+```
+
+Afterwards, start the daemon again and let it sync the blockchain: 
 
 ```
 komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \

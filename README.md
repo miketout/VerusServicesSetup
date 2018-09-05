@@ -614,3 +614,5 @@ As a last sanity check before reboots, `molly-guard` will prompt you for the hos
 ```
 apt -y install molly-guard
 ```
+
+Check `/etc/molly-guard/rc` for more options.

@@ -583,7 +583,7 @@ Run below command to activate the changes, alternatively reboot the machine:
 sysctl -p /etc/sysctl.conf
 ```
 
-### Reduce swapping
+### Change swapping behaviour
 
 If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting: 
 
@@ -591,7 +591,7 @@ If your system has a lot of RAM, you can change the swapping behaviour to only s
 vm.swappiness=1
 ```
 
-Run below command to activate the change, alternatively reboot the machine: 
+The lower the number, the `later` the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine: 
 
 ```
 sysctl -p /etc/sysctl.conf

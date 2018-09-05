@@ -7,13 +7,12 @@ A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores is the ab
 
 ## Operating System
 
-This guide is tested on Debian 9 "Stretch". Before starting, please install the latest updates.
+This guide tailored to and tested on Debian 9 "Stretch". Before starting, please install the latest updates:
 
 ```
 apt update
 apt -y upgrade
 ```
-
 
 ## Poolwallet
 

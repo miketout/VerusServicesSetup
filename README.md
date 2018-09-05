@@ -56,7 +56,7 @@ Start the VerusCoin daemon so we have a default configuration file:
 komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 \
 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 \
--addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
+-addnode=185.64.105.111 -daemon
 ```
 
 Let it run for a few seconds and stop it again: 
@@ -127,10 +127,10 @@ Create a new user account to run S-NOMP from. Switch to that user and clone S-NO
 ```
 useradd -m -d /home/s-nomp -s /bin/bash s-nomp
 su - s-nomp
-git clone https://github.com/hellcatz/s-nomp
+git clone https://github.com/miketout/s-nomp
 ```
 
-In `package.json`, change the `stratum-pool` dependency to `git+https://github.com/hellcatz/node-stratum-pool-1.git`. Next, install all dependencies using `npm`: 
+In `package.json`, change the `stratum-pool` dependency to `git+https://github.com/miketout/node-stratum-pool.git`. Next, install all dependencies using `npm`: 
 
 ```
 npm update
@@ -148,7 +148,7 @@ In the web dashboard of the pool there is a 'Pool Luck' display which gives a ro
 
 ```
 cd ~/s-nomp
-perl -p -i -e 's/_blocktime=160/_blocktime=55/g' libs/stats.js
+perl -p -i -e 's/_blocktime = 160/_blocktime = 55/g' libs/stats.js
 ```
 
 _Here be dragons, doges and ALL \o/ the code changes needed to get the pool fee working._
@@ -178,7 +178,10 @@ komodo-cli -ac_name=VRSC z_exportkey <VerusCoin z-address>
 
 **Save the data in an offline location, not on your computer!**
 
-Now, switch to the `s-nomp` account. First, copy `~/s-nomp/config_example.json` to `~/s-nomp/config.json` and in it, change the value of `stratumHost` to the external IP or DNS name of your server.
+Now, switch to the `s-nomp` account. First, copy `~/s-nomp/config_example.json` to `~/s-nomp/config.json`. Edit it to reflect the changes listed below.
+
+  * Under `clustering`, set `enabled` to `false`, otherwise PM2 fails to work.
+  * Set `stratumHost` to the external IP or DNS name of your server.
 
 Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below. 
 
@@ -216,7 +219,7 @@ Switch to the `s-nomp` user. Then start the pool using `pm2`:
 
 ```
 cd ~/s-nomp
-pm2 start init.js --name s-nomp
+pm2 start init.js --name s-nomp_veruscoin
 ```
 
 Use `pm2 log` to check for S-NOMP startup errors. 

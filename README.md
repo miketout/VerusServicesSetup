@@ -591,7 +591,7 @@ If your system has a lot of RAM, you can change the swapping behaviour to only s
 vm.swappiness=1
 ```
 
-The lower the number, the `later` the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine: 
+The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine: 
 
 ```
 sysctl -p /etc/sysctl.conf

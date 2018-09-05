@@ -516,7 +516,6 @@ echo tcp_bbr >> /etc/modules
 Edit your `/etc/sysctl.conf` to include below settings: 
 
 ```
-vm.swappiness=1
 net.ipv4.tcp_congestion_control=bbr
 net.core.rmem_default = 1048576
 net.core.wmem_default = 1048576
@@ -549,6 +548,20 @@ net.ipv4.tcp_limit_output_bytes = 131072
 
 Run below command to activate the changes, alternatively reboot the machine: 
 
+
+```
+sysctl -p /etc/sysctl.conf
+```
+
+### Reduce swapping
+
+If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting: 
+
+```
+vm.swappiness=1
+```
+
+Run below command to activate the change, alternatively reboot the machine: 
 
 ```
 sysctl -p /etc/sysctl.conf

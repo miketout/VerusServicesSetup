@@ -308,6 +308,36 @@ If you completed all steps correctly, the web dashboard on your pool can be reac
 
 ## Further considerations
 
+None of the topics below is strictly necessary, but most of them are recommended.
+
+### Improving SSH security
+
+If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't go google the comic, you might have missed a laugh there!
+
+Generate a proper `/etc/ssh/moduli` like this:
+
+```
+ssh-keygen -G "${HOME}/moduli" -b 4096
+mv /etc/ssh/moduli /etc/ssh/moduli.old
+ssh-keygen -T /etc/ssh/moduli -f "${HOME}/moduli"
+rm "${HOME}/moduli"
+```
+
+Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this: 
+
+```
+cd /etc/ssh
+rm ssh_host_*key*
+ssh-keygen -t ed25519 -f ssh_host_ed25519_key < /dev/null
+ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key < /dev/null
+```
+
+To finish, restart the ssh server: 
+
+```
+/etc/init.d/sshd restart
+```
+
 ### Putting the pool behind some CDN
 
 You should consider putting the webdashboard of your pool behind some CDN. A free CloudFlare account and any domain provider that allows changing the NS records of your domain will work. If you use a DNS name to point to your stratum ip, make sure to disable proxying for it!

@@ -136,7 +136,7 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 
 ## Python 3.7 & Prerequisites
 
-It's not exactly a 'clean' solution, but a working one. Add the `buster` packges to `/etc/apt/sources.list`: 
+It's not exactly a 'clean' solution, but a working one. Add the `buster` packages to `/etc/apt/sources.list`: 
 
 ```
 deb http://ftp.debian.org/debian buster main contrib non-free
@@ -383,16 +383,6 @@ The range is `1-100`. The *lower* the number, the *later* the system will start 
 ```
 sysctl -p /etc/sysctl.conf
 ```
-
-### Install `redis-commander`
-
-As `root`, install `redis-commander` like this: 
-
-```
-npm -g install redis-commander
-```
-
-Consult `redis-commander --help` for more information.
 
 ### Install `molly-guard`
 

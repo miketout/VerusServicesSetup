@@ -1,4 +1,4 @@
-# S-NOMP for VerusCoin Setup
+# S-NOMP for VerusCoin
 
 ## Server
 
@@ -58,7 +58,7 @@ komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -
 -addnode=185.64.105.111 -daemon
 ```
 
-Let it run for a few seconds and stop it again: 
+It will produce a lot of output, so probably open another console window or exit/reopen the current one. Let the daemon run for a few seconds and stop it again: 
 
 ```
 komodo-cli -ac_name=VRSC stop
@@ -94,7 +94,7 @@ bind=<your public ipv6 address>
 
 # rpc settings
 rpcuser=veruscoin
-rpcpassword=your-secret-veruscoin-rpc-password
+rpcpassword=<your-secret-veruscoin-rpc-password>
 rpcport=27486
 rpcthreads=256
 rpcworkqueue=1024
@@ -132,7 +132,7 @@ komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -
 -addnode=185.64.105.111 -daemon
 ```
 
-Because this time `STDOUT` and `STDERR` are not redirected, it will produce a lot of output on the console, but will tell you at a glance wether or not the daemon has started syncing the blockchain successfully. Either open a new shell or exit the current one to regain silence. To check the status and know when the initial sync has been completed, issue
+To check the status and know when the initial sync has been completed, issue
 
 ```
 komodo-cli -ac_name=VRSC getinfo
@@ -558,15 +558,8 @@ net.ipv4.udp_wmem_min = 16384
 net.core.netdev_max_backlog = 262144
 net.ipv4.tcp_max_orphans = 262144
 net.ipv4.tcp_max_syn_backlog = 262144
-#net.ipv4.tcp_no_metrics_save = 1
 net.ipv4.tcp_tw_reuse = 1
 net.ipv4.tcp_max_tw_buckets = 2000000
-#net.ipv4.tcp_fin_timeout = 10
-#net.ipv4.tcp_keepalive_time = 60
-#net.ipv4.tcp_keepalive_intvl = 10
-#net.ipv4.tcp_keepalive_probes = 3
-#net.ipv4.tcp_synack_retries = 2
-#net.ipv4.tcp_syn_retries = 2
 net.ipv4.ip_local_port_range = 16001 65530
 net.core.somaxconn = 20480
 net.ipv4.tcp_low_latency = 1

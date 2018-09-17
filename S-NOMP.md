@@ -89,20 +89,17 @@ timestampindex=1
 spentindex=1
 
 # make sure ipv4 & ipv6 is used
-bind=<your public ipv4 address>
-bind=<your public ipv6 address>
+bind=0.0.0.0
+bind=::1
 
 # rpc settings
 rpcuser=veruscoin
-rpcpassword=<your-secret-veruscoin-rpc-password>
+rpcpassword=your-secret-veruscoin-rpc-password
 rpcport=27486
 rpcthreads=256
 rpcworkqueue=1024
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
-
-# where to store exported data
-exportdir=/home/veruscoin/export
 
 # blocknotify
 blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %s

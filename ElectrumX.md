@@ -89,12 +89,12 @@ timestampindex=1
 spentindex=1
 
 # make sure ipv4 & ipv6 is used
-bind=<your public ipv4 address>
-bind=<your public ipv6 address>
+bind=0.0.0.0
+bind=::1
 
 # rpc settings
 rpcuser=veruscoin
-rpcpassword=<your-secret-veruscoin-rpc-password>
+rpcpassword=your-secret-veruscoin-rpc-password
 rpcport=27486
 rpcthreads=256
 rpcworkqueue=1024
@@ -147,11 +147,7 @@ Update the package list and install all necessary packages:
 
 ```
 apt update
-apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools git \
-       build-essential cmake libtool autotools-dev automake pkg-config \
-       libcurl4-gnutls-dev libssl-dev libevent-dev libdb++-dev zlib1g-dev libleveldb-dev \
-       libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libboost-random-dev \
-       unzip libsodium-dev sudo
+apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools
 ```
 
 After that has completed, remove the `buster` repos from `/etc/apt/sources.list` and update the package list again. To sum up, do this: 
@@ -165,19 +161,18 @@ ln -s python3.7 python3
 
 ## ElectrumX Installation
 
-Create a new user, (temporarily) enable sudo without password and switch to it: 
+Create a new system user for `electrumx`.
 
 ```
-useradd -m -d /home/electrumx -s /bin/bash electrumx
-echo "electrumx ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/010-electrumx
-su - electrux
+useradd -rMs /bin/false electrumx
 ```
 
 Now, check out the Veruscoin ElectrumX repo and install it: 
 
 ```
+cd /usr/src
 git clone https://github.com/VerusCoin/electrumx
-cd electrumx; sudo python3 setup.py install
+cd electrumx; python3 setup.py install
 ```
 
 ## ElectrumX Configuration
@@ -185,11 +180,11 @@ cd electrumx; sudo python3 setup.py install
 Switch back to root. Copy over the `systemd` unit file and create `/etc/electrumx.conf`. Create a datadir and assign ownership to the `electrumx` user.
 
 ```
-cp /home/electrumx/electrumx/contrib/systemd/electrumx.service /etc/systemd/system
+cp /usr/src/electrumx/contrib/systemd/electrumx.service /etc/systemd/system
 cat <<EOF >/etc/electrumx.conf
 COIN = Verus
 DB_DIRECTORY = /electrumdb/VRSC
-DAEMON_URL = http://veruscoin:<your-secret-veruscoin-rpc-password>@127.0.0.1:27486/
+DAEMON_URL = http://veruscoin:your-secret-veruscoin-rpc-password@127.0.0.1:27486/
 RPC_HOST = 127.0.0.1
 RPC_PORT = 8000
 HOST =
@@ -200,7 +195,7 @@ EOF
 mkdir -p /electrumdb/VRSC && chown electrumx:electrumx /electrumdb/VRSC
 ```
 
-Make sure the VerusCoin wallet is running. You should now be able to start ElectrumX (as `root`, it will switch to `electrumx` user) successfully: 
+Make sure the VerusCoin wallet is running. You should now be able to start ElectrumX.
 
 ```
 systemd start electrumx

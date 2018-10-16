@@ -74,6 +74,9 @@ listen=1
 listenonion=0
 maxconnections=256
 
+# wallet is not needed
+disablewallet=1
+
 # logging related options
 logtimestamps=1
 logips=1
@@ -104,9 +107,8 @@ rpcallowip=127.0.0.1
 # if a peer jacks up more than 25 times in a row, ban it
 banscore=25
 
-# stake if possible, although it's probably not helping much
-gen=1
-genproclimit=0
+# make sure gen is off
+gen=0
 
 # addnodes
 seednode=185.25.48.236:27485
@@ -150,7 +152,18 @@ apt update
 apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools
 ```
 
-After that has completed, remove the `buster` repos from `/etc/apt/sources.list` and update the package list again. To sum up, do this: 
+After that has completed, remove the `buster` repos from `/etc/apt/sources.list`. Then reinstall below packages and update the package list again. 
+
+```
+<edit /etc/apt/sources.list>
+cd ~/
+wget http://ftp.de.debian.org/debian/pool/main/a/apt/libapt-pkg5.0_1.4.8_amd64.deb
+wget http://ftp.de.debian.org/debian/pool/main/a/apt/apt_1.4.8_amd64.deb
+dpkg -i ~/*.deb
+apt update
+```
+
+To sum up, do this: 
 
 ```
 cd /usr/bin
@@ -198,13 +211,13 @@ mkdir -p /electrumdb/VRSC && chown electrumx:electrumx /electrumdb/VRSC
 Make sure the VerusCoin wallet is running. You should now be able to start ElectrumX.
 
 ```
-systemd start electrumx
+systemctl start electrumx
 ```
 
 Display the logs with this command: 
 
 ```
-journalctrl -fu electrumx.service
+journalctl -fu electrumx.service
 ```
 
 Initial sync will take up to 2 hours to complete. Before that is done, ElectrumX will only allow RPC connections via loopback, but no external connections. To check ElectrumX status, do
@@ -248,7 +261,7 @@ To finish, restart the ssh server:
 
 ### Enable `logrotate` 
 
-As `root` user, create a file called `/etc/logrotate.d/pool` with these contents: 
+As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents: 
 
 ```
 /home/veruscoin/.komodo/VRSC/debug.log

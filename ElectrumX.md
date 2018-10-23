@@ -149,7 +149,7 @@ Update the package list and install all necessary packages:
 
 ```
 apt update
-apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools
+apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools python3-chardet
 ```
 
 After that has completed, remove the `buster` repos from `/etc/apt/sources.list`. Then reinstall below packages and update the package list again. 

@@ -284,12 +284,6 @@ Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and includ
 @reboot /home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
 ```
 
-Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below:
-
-```
-@reboot /bin/sleep 60 && cd /home/s-nomp/s-nomp && /usr/bin/pm2 start init.js --name s-nomp
-```
-
 ### Simplify wallet usage
 
 Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this: 

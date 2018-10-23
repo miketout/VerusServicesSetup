@@ -49,22 +49,17 @@ cp src/komodod src/komodo-cli src/komodo-tx ~/bin
 strip ~/bin/komodo*
 ```
 
-Start the VerusCoin daemon so we have a default configuration file:
+Now, lets create the data directory. Then, get the bootstrap and unpack it there.
 
 ```
-komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
--ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 \
--ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 \
--addnode=185.64.105.111 -daemon
+mkdir -p ~/.komodo/VRSC
+cd ~/.komodo/VRSC
+wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
+tar zxf VRSC-bootstrap.tar.gz
+rm VRSC-bootstrap.tar.gz
 ```
 
-Let it run for a few seconds and stop it again: 
-
-```
-komodo-cli -ac_name=VRSC stop
-```
-
-Edit the resulting `~/.komodo/VRSC/VRSC.conf` to include the parameters listed below, adapt the ones that need to be adapted.
+Create `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
 A resonably secure `rpcpassword` can be generated using this command: 
 `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
 

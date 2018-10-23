@@ -138,38 +138,21 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 
 ## Python 3.7 & Prerequisites
 
-It's not exactly a 'clean' solution, but a working one. Add the `buster` packages to `/etc/apt/sources.list`: 
+To install Python 3.7.1 from source, execute the below steps.
 
 ```
-deb http://ftp.debian.org/debian buster main contrib non-free
-deb-src http://ftp.debian.org/debian buster main contrib non-free
-```
+apt update; apt -y upgrade
+apt -y install build-essential libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev \
+               libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev
+cd /usr/src/
+wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
+tar zxvf Python-3.7.1.tgz 
+cd Python-3.7.1/
+./configure --enable-optimizations 
+make -j$(nproc)
+make altinstall
+pip3.7 install multidict chardet
 
-Update the package list and install all necessary packages: 
-
-```
-apt update
-apt -y install python3.7 python3.7-dev python3-multidict python3-setuptools python3-chardet
-```
-
-After that has completed, remove the `buster` repos from `/etc/apt/sources.list`. Then reinstall below packages and update the package list again. 
-
-```
-<edit /etc/apt/sources.list>
-cd ~/
-wget http://ftp.de.debian.org/debian/pool/main/a/apt/libapt-pkg5.0_1.4.8_amd64.deb
-wget http://ftp.de.debian.org/debian/pool/main/a/apt/apt_1.4.8_amd64.deb
-dpkg -i ~/*.deb
-apt update
-```
-
-To sum up, do this: 
-
-```
-cd /usr/bin
-rm python3 python3m
-ln -s python3.7m python3m
-ln -s python3.7 python3
 ```
 
 ## ElectrumX Installation

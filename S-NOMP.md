@@ -108,8 +108,7 @@ blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %
 banscore=25
 
 # stake if possible, although it's probably not helping much
-gen=1
-genproclimit=0
+mint=1
 
 # addnodes
 seednode=185.25.48.236:27485

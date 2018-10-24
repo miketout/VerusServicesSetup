@@ -159,8 +159,9 @@ Still as `root`, install Node.js v8 like this:
 ```
 curl -sL https://deb.nodesource.com/setup_8.x | bash -
 apt -y install nodejs
-
 ```
+
+**NOTE** Node v10 won't work. You _will_ have to use Node v8!
 
 We will use [PM2](http://pm2.keymetrics.io) to manage NodeJS processes. Install it globally:
 

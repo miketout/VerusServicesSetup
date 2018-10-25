@@ -163,7 +163,7 @@ Now, check out the Veruscoin ElectrumX repo and install it:
 ```
 cd /usr/src
 git clone https://github.com/VerusCoin/electrumx
-cd electrumx; python3 setup.py install
+cd electrumx; python3.7 setup.py install
 ```
 
 ## ElectrumX Configuration

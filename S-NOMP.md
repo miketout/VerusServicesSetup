@@ -85,7 +85,7 @@ spentindex=1
 
 # make sure ipv4 & ipv6 is used
 bind=0.0.0.0
-bind=::1
+bind=::
 
 # rpc settings
 rpcuser=veruscoin

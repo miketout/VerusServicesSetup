@@ -114,7 +114,7 @@ seednode=185.25.48.72:27485
 seednode=185.25.48.72:27487
 ```
 
-For proper ElectrumX operation, `txindex=1` is crucial. Afterwards, start the daemon again and let it sync the blockchain: 
+For proper ElectrumX operation, `txindex=1` is crucial. Afterwards, start the daemon and let it sync the small rest of the blockchain: 
 
 ```
 komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
@@ -147,7 +147,6 @@ cd Python-3.7.1/
 make -j$(nproc)
 make altinstall
 pip3.7 install multidict chardet
-
 ```
 
 ## ElectrumX Installation
@@ -189,13 +188,19 @@ mkdir -p /electrumdb/VRSC && chown electrumx:electrumx /electrumdb/VRSC
 Make sure the VerusCoin wallet is running. You should now be able to start ElectrumX.
 
 ```
-systemctl start electrumx
+systemctl start electrumx.service
 ```
 
 Display the logs with this command: 
 
 ```
 journalctl -fu electrumx.service
+```
+
+Enable autostart with this command:
+
+```
+systemctl enable electrumx.service
 ```
 
 Initial sync will take up to 2 hours to complete. Before that is done, ElectrumX will only allow RPC connections via loopback, but no external connections. To check ElectrumX status, do

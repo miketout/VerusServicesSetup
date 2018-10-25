@@ -170,7 +170,7 @@ See https://github.com/iquidus/explorer for the list of install instructions of 
 "genesis_tx": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
 ```
 
-You may want to disable the `twitter` and `markets` display.
+You may want to disable the `twitter` and `markets` display. You should only bind Iquidus to loopback and proxy this to the world with nginx.
 
 
 Make sure the VerusCoin wallet is running. You should now be able to start Iquidus.

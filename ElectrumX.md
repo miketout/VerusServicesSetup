@@ -209,6 +209,12 @@ Initial sync will take up to 2 hours to complete. Before that is done, ElectrumX
 electrumx_rpc getinfo
 ```
 
+To see info about connected clients, execute
+
+```
+electrumx_rpc sessions
+```
+
 
 ## Further considerations
 

@@ -203,7 +203,7 @@ Enable autostart with this command:
 systemctl enable electrumx.service
 ```
 
-Initial sync will take up to 2 hours to complete. Before that is done, ElectrumX will only allow RPC connections via loopback, but no external connections. To check ElectrumX status, do
+Initial sync will take up to 3 hours to complete. Before that is done, ElectrumX will only allow RPC connections via loopback, but no external connections. To check ElectrumX status, do
 
 ```
 electrumx_rpc getinfo

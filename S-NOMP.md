@@ -177,7 +177,7 @@ Create a new user account to run S-NOMP from. Switch to that user and clone S-NO
 ```
 useradd -m -d /home/s-nomp -s /bin/bash s-nomp
 su - s-nomp
-git clone https://github.com/miketout/s-nomp
+git clone https://github.com/veruscoin/s-nomp
 ```
 
 In `package.json`, change the `stratum-pool` dependency to `git+https://github.com/miketout/node-stratum-pool.git`. Next, install all dependencies using `npm`: 

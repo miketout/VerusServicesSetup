@@ -203,11 +203,11 @@ perl -p -i -e 's/_blocktime = 160/_blocktime = 55/g' libs/stats.js
 
 Edit the `coins/vrsc.json` to look like below. **NOTE:** including the `burnFees` parameter is the crucial key part here.
 
-```
-{
+```{
     "name": "verus",
     "symbol": "vrsc",
     "algorithm": "verushash",
+    "sapling": 227520,
     "txfee": 0.0005,
     "requireShielding": true,
     "burnFees": true,

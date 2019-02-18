@@ -89,13 +89,15 @@ proxy=127.0.0.1:9050
 
 Now restart your wallet.
 
-`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. For reference, here's a list of 3 TOR endpoints you could consider 'official' to the VerusCoin project. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
+`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. Also, the `debug.log` will have the onion hostname that the wallet uses (case-insensitive search for `service id`). For reference, here's a list of 3 TOR endpoints you could consider 'official' to the VerusCoin project. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
 
 ```
 addnode=qxgvbauwyxshhp46.onion:27485
 addnode=ndy4q5hqvgrq3moe.onion:27485
 addnode=av3hnhrk5hhojvd2.onion:27485
 ```
+
+You **can** put the onion hostname you extracted from `debug.log` as the `externalip=` into your config file, but it is not strictly necessary.
 
 ## Conclusion
 

@@ -5,7 +5,7 @@ Also, this guide only exists because it isn't just about adding `listenonion=1` 
 
 The Hidden Service part of this guide (`listenonion=1` in the Verus daemon config) may not be necessary, but it will benefit the general availability of VerusCoin within the TOR network at no privacy expense on the users end.
 
-**Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible TOR client setups clearly is beyond the scope of this guide. For example, DNS resolving isn't taken care of at all below!**
+**Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible TOR client setups clearly is beyond the scope of this guide. For example, DNS resolving is only roughly mentioned below!**
 
 ## Prerequisites
 

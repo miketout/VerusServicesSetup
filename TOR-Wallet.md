@@ -48,6 +48,12 @@ sudo -u debian-tor mkdir .arm
 sudo -u debian-tor ln -s /etc/tor/torrc .arm/
 ```
 
+`tor-arm` will give you quite a bit of insight into the state of your TOR client. To run it, do this:
+
+```
+sudo -u debian-tor arm
+```
+
 Now, restart your TOR client. Afterwards, you can get your `.onion` hostname. 
 
 ```

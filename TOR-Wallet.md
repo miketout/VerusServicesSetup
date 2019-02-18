@@ -85,7 +85,7 @@ bind=127.0.0.1:27485
 proxy=127.0.0.1:9050
 ```
 
-**Most important, remove any `bind=` statements that contains anything else than your loopback IP!!!**
+**Most important, remove any `bind=` statement that contains anything else than your loopback IP!!!**
 
 Now restart your wallet.
 

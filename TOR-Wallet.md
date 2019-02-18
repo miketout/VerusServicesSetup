@@ -58,6 +58,12 @@ sudo /etc/init.d/tor restart
 
 ## Setup the VerusCoin wallet
 
+To allow your wallet to setup a hidden service by itself, you have to add the user account from which the wallet is running to the `debian-tor` group like so: 
+
+```
+sudo gpasswd -a VERUSCOINUSERNAME debian-tor
+```
+
 These lines have to go into your `~/.komodo/VRSC/VRSC.conf`. Some may be there already, just change them. The value for `externalip` is taken from the `/var/lib/tor/veruscoin/hostname` file and suffixed with the standard VerusCoin port, seperated by `:`.
 
 ```

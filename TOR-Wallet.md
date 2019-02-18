@@ -100,3 +100,5 @@ addnode=av3hnhrk5hhojvd2.onion:27485
 ## Conclusion
 
 **Again, i cannot stress this enough. DO NOT TRUST THIS GUIDE ALONE to establish your privacy regarding VerusCoin connections. Read about TOR.** However, if you did follow the above steps correctly, all your VerusCoin related peer-to-peer traffic should now not only go through the tor network, but be properly untraceable.
+
+Probably, if privacy is a must-have for you, you may want to learn about [Tails OS](https://tails.boum.org/) if you haven't already.

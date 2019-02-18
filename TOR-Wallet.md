@@ -21,6 +21,12 @@ sudo apt -y install tor tor-arm
 
 ## Setup TOR
 
+For further information about the TOR options mentioned in this paragraph, see:
+
+```
+man tor
+```
+
 Remember the last, bold-printed paragraph of the introduction? Good. 
 
 Put this into your `/etc/tor/torrc`: 
@@ -36,7 +42,7 @@ ControlPort 9051
 
 If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine.
 
-Change to your `/var/lib/tor` directory. We'll do 2 slight things to make `tor-arm` complain less.
+Change to your `/var/lib/tor` directory. We'll do 2 things to make `tor-arm` complain less.
 
 ```
 cd /var/lib/tor
@@ -48,6 +54,12 @@ sudo -u debian-tor ln -s /etc/tor/torrc .arm/
 
 ```
 sudo -u debian-tor arm
+```
+
+See it's manpage for details: 
+
+```
+man arm
 ```
 
 Now, restart your TOR client.

@@ -3,9 +3,9 @@
 First things first, as of writing this (`2019-02-18`), there does not seem to be a way to use Agama via or within TOR properly if you expect privacy. 
 Also, this guide only exists because it isn't just about adding `listenonion=1` to your config :-)
 
-**Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible TOR client setups clearly is beyond the scope of this guide. For example, DNS resolving isn't taken care of at all below!**
-
 The Hidden Service part of this guide may not be necessary, but it will benefit the general availability of VerusCoin within the TOR network at no privacy expense on the users end.
+
+**Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible TOR client setups clearly is beyond the scope of this guide. For example, DNS resolving isn't taken care of at all below!**
 
 ## Prerequisites
 

@@ -40,7 +40,15 @@ SOCKSPolicy reject *:*
 ControlPort 9051
 ```
 
-If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine.
+If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine. Feel free to use the config statement below for your TOR pleasure:
+
+```
+# 0x03relay0: 5.9.224.251
+# 0x03relay1: 136.243.227.142
+# 0x03relay2: 95.216.104.213
+StrictNodes 1
+EntryNodes 5.9.224.251,136.243.227.142,95.216.104.213
+```
 
 Change to your `/var/lib/tor` directory. We'll do 2 things to make `tor-arm` complain less.
 

@@ -35,7 +35,7 @@ Put this into your `/etc/tor/torrc`:
 DisableDebuggerAttachment 0
 ClientOnly 1
 SOCKSPort 9050
-SOCKSPolicy allow 127.0.0.0/8
+SOCKSPolicy accept 127.0.0.0/8
 SOCKSPolicy reject *:*
 ControlPort 9051
 ```

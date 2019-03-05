@@ -133,7 +133,7 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 
 ## NodeJS 8 & Prerequisites
 
-Iquidus Explorer will need Node v8 (v10 won't work) to run.
+Install NodeJS v10 like this: 
 
 ```
 curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -141,6 +141,7 @@ apt update; apt -y upgrade
 apt -y install nodejs
 npm -g install pm2
 ```
+Alternatively, if you'd like to keep all the NodeJS-related data within a user account, you can use [nvm.sh](https://nvm.sh) to install NodeJS into the `veruscoin-explorer` account. See their notes for more info. 
 
 ## Iquidus Installation
 

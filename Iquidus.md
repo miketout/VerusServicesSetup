@@ -131,7 +131,7 @@ komodo-cli -ac_name=VRSC getinfo
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
-## NodeJS 8 & Prerequisites
+## NodeJS 10 & Prerequisites
 
 Install NodeJS v10 like this: 
 

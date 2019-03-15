@@ -221,9 +221,6 @@ electrumx_rpc sessions
 None of the topics below is strictly necessary, but most of them are recommended.
 
 ### Improving SSH security
-
-If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't go google the comic, you might have missed a laugh there!
-
 As `root`, generate a proper `/etc/ssh/moduli` like this:
 
 ```

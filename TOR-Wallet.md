@@ -46,8 +46,9 @@ If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes
 # 0x03relay0: 5.9.224.251
 # 0x03relay1: 136.243.227.142
 # 0x03relay2: 95.216.104.213
+# 0x03relay3: 95.216.252.176
 StrictNodes 1
-EntryNodes 5.9.224.251,136.243.227.142,95.216.104.213
+EntryNodes 5.9.224.251,136.243.227.142,95.216.104.213,95.216.252.176
 ```
 
 Change to your `/var/lib/tor` directory. We'll do 2 things to make `tor-arm` complain less.

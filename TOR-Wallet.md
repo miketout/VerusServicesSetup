@@ -107,6 +107,6 @@ You **can** put the onion hostname you extracted from `debug.log` as the `extern
 
 ## Conclusion
 
-**Again, i cannot stress this enough. DO NOT TRUST THIS GUIDE ALONE to establish your privacy regarding VerusCoin connections. Read about TOR.** However, if you did follow the above steps correctly, all your VerusCoin related peer-to-peer traffic should now not only go through the tor network, but be properly untraceable.
+**Again, i cannot stress this enough. DO NOT TRUST THIS GUIDE ALONE to establish your privacy regarding VerusCoin connections. Read about [TOR](https://www.torproject.org).** However, if you did follow the above steps correctly, all your VerusCoin related peer-to-peer traffic should now not only go through the tor network, but be properly untraceable.
 
 Probably, if privacy is a must-have for you, you may want to learn about [Tails OS](https://tails.boum.org/) if you haven't already.

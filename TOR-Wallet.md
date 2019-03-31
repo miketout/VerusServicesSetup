@@ -40,13 +40,9 @@ SOCKSPolicy reject *:*
 ControlPort 9051
 ```
 
-If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine. Feel free to use the config statement below for your TOR pleasure:
+If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine. Feel free to use the config statement below for your TOR pleasure. The specified TOR nodes are operated by a VerusCoin community member.
 
 ```
-# 0x03relay0: 5.9.224.251
-# 0x03relay1: 136.243.227.142
-# 0x03relay2: 95.216.104.213
-# 0x03relay3: 95.216.252.176
 StrictNodes 1
 EntryNodes 5.9.224.251,136.243.227.142,95.216.104.213,95.216.252.176
 ```
@@ -90,6 +86,7 @@ These lines have to go into your `~/.komodo/VRSC/VRSC.conf`. Some may be there a
 ```
 listen=1
 listenonion=1
+onlynet=onion
 bind=127.0.0.1:27485
 proxy=127.0.0.1:9050
 ```
@@ -98,7 +95,7 @@ proxy=127.0.0.1:9050
 
 Now restart your wallet.
 
-`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. Also, the `debug.log` will have the onion hostname that the wallet uses (case-insensitive search for `service id`). For reference, here's a list of 3 TOR endpoints you could consider 'official' to the VerusCoin project. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
+`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. For reference, here's a list of 3 TOR VerusCoin endpoints operated by a community member. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
 
 ```
 addnode=qxgvbauwyxshhp46.onion:27485

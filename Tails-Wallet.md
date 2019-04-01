@@ -87,8 +87,7 @@ if [ -z "${RPCPORT}" ] || [ "${RPCPORT}" -neq "${RPCPORT}" ] > /dev/null 2>&1; t
 	RPCPORT=27486
 fi
 
-# check if port is already opened
-# this is true when PORTCHECK is an empty string
+# check if port is already opened, open if not
 PORTCHECK=$(/usr/bin/sudo /sbin/iptables -L | /bin/grep ${RPCPORT})
 if [ -z "${PORTCHECK}" ]; then
 	/usr/bin/sudo /sbin/iptables -I OUTPUT -o lo -p tcp --dport ${RPCPORT} -j ACCEPT

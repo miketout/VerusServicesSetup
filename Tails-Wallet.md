@@ -8,11 +8,11 @@ This document describes a way to run a VerusCoin native wallet from within [Tail
 
 Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of `Tails` onto that USB stick.
 
-To be able to complete this guide (and use VerusCoin afterwards), you will have to set an administration password for `Tails`. Also, you need a `persistant volume` which is set to store at least `Personal Data` and `Dotfiles`.
+To be able to complete this guide (and use VerusCoin afterwards), you will have to set an administration password for `Tails`. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
 
 ## Build/obtain VerusCoin binaries
 
-For now, `build.sh` sometimes fails via TOR. Appearantly, some download servers of opensource projects do not like TOR exit nodes. What a shame. However, that leaves us with 2 options: 
+For now, `build.sh` sometimes fails via TOR. Appearantly, some download servers of opensource projects do not like TOR exit nodes. **What a shame.** However, that leaves us with 2 options: 
 
 1. Download and use premade binaries from [veruscoin.io](https://veruscoin.io)
 2. Build the binaries on another system and copy them into your Tails instance.
@@ -70,6 +70,8 @@ chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 ```
 
 **`veruscoind`**
+
+*This will ask for your Tails administration password multiple times in order to check/set iptables rules.**
 
 ```
 cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind

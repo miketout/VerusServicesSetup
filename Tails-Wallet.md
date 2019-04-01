@@ -82,7 +82,7 @@ OLDPWD="$(pwd)"
 
 # determine configured rpcport (or use default value) 
 # then open port in firewall
-RPCPORT=$(/bin/cat ${HOME}/Persistent/Verus/VRSC.conf | /bin/grep rpcport | /usr/bin/cut -f2 -d=)
+RPCPORT=$(/bin/cat ${HOME}/Persistent/VerusCoin/VRSC.conf | /bin/grep rpcport | /usr/bin/cut -f2 -d=)
 if [ -z "${RPCPORT}" ] || [ "${RPCPORT}" -neq "${RPCPORT}" ] > /dev/null 2>&1; then 
 	RPCPORT=27486
 fi
@@ -94,7 +94,7 @@ if [ -z "${PORTCHECK}" ]; then
 fi
 
 # change working dir to verus datadir
-cd ${HOME}/Persistent/Verus
+cd ${HOME}/Persistent/VerusCoin
 
 # start veruscoin
 ${HOME}/bin/komodod \

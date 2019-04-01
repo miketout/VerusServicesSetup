@@ -1,14 +1,14 @@
 # Running a VerusCoin Wallet on Tails
 
-This document describes a way to run a VerusCoin native wallet from within [Tails](https://tails.boum.org). Sadly, because `Tails` relies on TOR for anonymous networking, Agama isn't going to work, thus it will be a native commandline wallet.
+This document describes a way to run a VerusCoin native wallet from within [Tails](https://tails.boum.org). Sadly, because Tails relies on TOR for anonymous networking, Agama isn't going to work, thus it will be a native commandline wallet.
 
 **Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible Tails options clearly is beyond the scope of this guide.**
 
 ## Prerequisites
 
-Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of `Tails` onto that USB stick.
+Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of Tails onto that USB stick.
 
-To be able to complete this guide (and use VerusCoin afterwards), you will have to set an administration password for `Tails`. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
+To be able to complete this guide (and use VerusCoin afterwards), you will have to set an administration password for Tails. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
 
 ## Build/obtain VerusCoin binaries
 
@@ -71,7 +71,7 @@ chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 
 **`veruscoind`**
 
-*This will ask for your Tails administration password multiple times in order to check/set iptables rules.**
+*When run, this will ask for your Tails administration password multiple times in order to check/set `iptables` rules. This is necessary in order to allow any communication from and to the wallet at all.*
 
 ```
 cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind
@@ -172,3 +172,15 @@ addnode=ndy4q5hqvgrq3moe.onion:27485
 addnode=av3hnhrk5hhojvd2.onion:27485
 EOF
 ```
+
+6. Reboot Tails
+
+This is necessary to get the changes to your `persistent volume` into the running system. Remember to set an administration password for Tails again after reboot.
+
+7. Start VerusCoin
+
+```
+veruscoind -daemon 1>/dev/null 2>&1
+tail -f ~/Persistence/VerusCoin/debug.log
+```
+

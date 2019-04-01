@@ -132,7 +132,7 @@ mv ~/.zcash-params /live/persistence/TailsData_unlocked/dotfiles
 **NOTE: Use the preinstalled `GtkHash` tool to verify checksums of the bootstrap download.**
 
 ```
-mkdir -p ${HOME}/Persistence/VerusCoin/export; cd ${HOME}/Persistence/VerusCoin
+mkdir -p ${HOME}/Persistent/VerusCoin/export; cd ${HOME}/Persistent/VerusCoin
 wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
 wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.md5sum
 wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.sha256sum
@@ -142,7 +142,7 @@ tar zxf VRSC-bootstrap.tar.gz
 5. Create VRSC.conf
 
 ```
-cat <<EOF >${HOME}/Persistence/VerusCoin/VRSC.conf
+cat <<EOF >${HOME}/Persistent/VerusCoin/VRSC.conf
 listen=0
 listenonion=0
 port=27485
@@ -155,7 +155,7 @@ logtimestamps=1
 logips=1
 shrinkdebugfile=1
 
-exportdir=${HOME}/Persistence/VerusCoin/export
+exportdir=${HOME}/Persistent/VerusCoin/export
 
 server=1
 rpcport=27486
@@ -180,6 +180,6 @@ This is necessary to get the changes to your `persistent volume` into the runnin
 
 ```
 veruscoind -daemon 1>/dev/null 2>&1
-tail -f ~/Persistence/VerusCoin/debug.log
+tail -f ~/Persistent/VerusCoin/debug.log
 ```
 

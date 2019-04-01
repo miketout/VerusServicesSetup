@@ -1,0 +1,172 @@
+# Running a VerusCoin Wallet on Tails
+
+This document describes a way to run a VerusCoin native wallet from within [Tails](https://tails.boum.org). Sadly, because `Tails` relies on TOR for anonymous networking, Agama isn't going to work, thus it will be a native commandline wallet.
+
+**Please, for your own safety, do not take this guide as the full and only truth. Do your own research. Think of this guide as a helper only. Explaining all possible Tails options clearly is beyond the scope of this guide.**
+
+## Prerequisites
+
+Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of `Tails` onto that USB stick.
+
+To be able to complete this guide (and use VerusCoin afterwards), you will have to set an administration password for `Tails`. Also, you need a `persistant volume` which is set to store at least `Personal Data` and `Dotfiles`.
+
+## Build/obtain VerusCoin binaries
+
+For now, `build.sh` sometimes fails via TOR. Appearantly, some download servers of opensource projects do not like TOR exit nodes. What a shame. However, that leaves us with 2 options: 
+
+1. Download and use premade binaries from [veruscoin.io](https://veruscoin.io)
+2. Build the binaries on another system and copy them into your Tails instance.
+
+For reference, here's a quick cheatsheet for building on Debian-ish systems:
+
+```
+sudo apt update
+apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib autoconf \
+	libtool ncurses-dev unzip git python python-zmq zlib1g-dev wget \
+	libcurl4-openssl-dev bsdmainutils automake curl
+git clone https://github.com/veruscoin/veruscoin
+cd veruscoin
+./zcutil/build.sh -j$(nproc)
+strip src/komodod src/komodo-cli src/komodo-tx
+```
+
+Copy over these files: 
+```
+veruscoin/src/komodod
+veruscoin/src/komodo-tx
+veruscoin/src/komodo-cli
+veruscoin/zcutil/fetch-params.sh
+```
+
+## Integrate wallet into Tails
+
+Execute below steps in order.
+
+1. Create persistent `bin` dir, copy over binaries and script mentioned above
+
+```
+cd /live/persistence/TailsData_unlocked/
+mkdir dotfiles/bin
+```
+
+Copy over `komodod`, `komodo-cli`, `komodo-tx` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin`
+
+2. Create custom `veruscoin-cli` and `veruscoind` scripts
+
+These are necessary because we have to set another data directory. Feel free to name the scripts whatever you want, tho.
+
+**`veruscoin-cli`**
+
+```
+cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
+#!/bin/bash
+
+${HOME}/bin/komodo-cli \
+	-datadir=${HOME}/Persistent/VerusCoin \
+	-ac_name=VRSC \
+	"$@"
+EOF
+chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
+```
+
+**`veruscoind`**
+
+```
+cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind
+#!/bin/bash -x
+
+# save current working dir for later
+OLDPWD="$(pwd)"
+
+# determine configured rpcport (or use default value) 
+# then open port in firewall
+RPCPORT=$(/bin/cat ${HOME}/Persistent/Verus/VRSC.conf | /bin/grep rpcport | /usr/bin/cut -f2 -d=)
+if [ -z "${RPCPORT}" ] || [ "${RPCPORT}" -neq "${RPCPORT}" ] > /dev/null 2>&1; then 
+	RPCPORT=27486
+fi
+
+# check if port is already opened
+# this is true when PORTCHECK is an empty string
+PORTCHECK=$(/usr/bin/sudo /sbin/iptables -L | /bin/grep ${RPCPORT})
+if [ -z "${PORTCHECK}" ]; then
+	/usr/bin/sudo /sbin/iptables -I OUTPUT -o lo -p tcp --dport ${RPCPORT} -j ACCEPT
+fi
+
+# change working dir to verus datadir
+cd ${HOME}/Persistent/Verus
+
+# start veruscoin
+${HOME}/bin/komodod \
+	-datadir=${HOME}/Persistent/VerusCoin \
+	-ac_name=VRSC \
+	-ac_algo=verushash \
+	-ac_cc=1 \
+	-ac_supply=0 \
+	-ac_eras=3 \
+	-ac_reward=0,38400000000,2400000000 \
+	-ac_halving=1,43200,1051920 \
+	-ac_decay=100000000,0,0 \
+	-ac_end=10080,226080,0 \
+	-ac_timelockgte=19200000000 \
+	-ac_timeunlockfrom=129600 \
+	-ac_timeunlockto=1180800 \
+	-ac_veruspos=50 \
+	"${@}" 1>/dev/null 2>&1
+
+# return to old working dir
+cd "${OLDPWD}"
+EOF
+```
+
+3. Download `zcash-params` and move to `dotfiles` directory
+
+```
+cd ~
+/live/persistence/TailsData_unlocked/dotfiles/bin/fetch-params.sh
+mv ~/.zcash-params /live/persistence/TailsData_unlocked/dotfiles
+```
+
+4. Create and prepare data directory
+
+**NOTE: Use the preinstalled `GtkHash` tool to verify checksums of the bootstrap download.**
+
+```
+mkdir -p ${HOME}/Persistence/VerusCoin/export; cd ${HOME}/Persistence/VerusCoin
+wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
+wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.md5sum
+wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.sha256sum
+tar zxf VRSC-bootstrap.tar.gz
+```
+
+5. Create VRSC.conf
+
+```
+cat <<EOF >${HOME}/Persistence/VerusCoin/VRSC.conf
+listen=0
+listenonion=0
+port=27485
+proxy=127.0.0.1:9050
+onlynet=onion
+
+txindex=1
+
+logtimestamps=1
+logips=1
+shrinkdebugfile=1
+
+exportdir=${HOME}/Persistence/VerusCoin/export
+
+server=1
+rpcport=27486
+rpcuser=veruscoin-${RANDOM}-$(whoami)
+rpcpassword=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+rpcthreads=1
+rpcworkqueue=4
+
+addnode=qxgvbauwyxshhp46.onion:27485
+addnode=ndy4q5hqvgrq3moe.onion:27485
+addnode=av3hnhrk5hhojvd2.onion:27485
+EOF
+```

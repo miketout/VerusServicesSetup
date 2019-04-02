@@ -8,7 +8,7 @@ This document describes a way to run a VerusCoin native wallet from within [Tail
 
 Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of Tails onto that USB stick.
 
-To be able to complete this guide (and use VerusCoin afterwards), you will have to set an [administration password](https://tails.boum.org/administration_password/) for Tails. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
+To be able to complete this guide (and use VerusCoin afterwards), you will have to set an [administration password](https://tails.boum.org/administration_password/) for Tails on every boot. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
 
 ## Build/obtain VerusCoin binaries
 
@@ -39,20 +39,19 @@ veruscoin/zcutil/fetch-params.sh
 
 ## Integrate wallet into Tails
 
-Execute below steps in order.
+Execute below steps in order to integrate the wallet into your Tails installation.
 
-1. Create persistent `bin` dir, copy over binaries and script mentioned above
+1. Create persistent `bin` dir.
 
 ```
-cd /live/persistence/TailsData_unlocked/
-mkdir dotfiles/bin
+mkdir /live/persistence/TailsData_unlocked/dotfiles/bin
 ```
 
-Copy over `komodod`, `komodo-cli` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin`
+Copy over `komodod`, `komodo-cli` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin` and make sure all files are `chmod +x`.
 
 2. Create custom `veruscoin-cli` and `veruscoind` scripts
 
-These are necessary because we have to set another data directory. Feel free to name the scripts whatever you want, tho.
+These custom scripts are necessary because we have to set another data directory and need to fiddle with `iptables` before we can use the daemon. Feel free to name the scripts whatever you want, tho.
 
 **`veruscoin-cli`**
 
@@ -111,7 +110,7 @@ ${HOME}/bin/komodod \
 	-ac_timeunlockfrom=129600 \
 	-ac_timeunlockto=1180800 \
 	-ac_veruspos=50 \
-	"${@}" 1>/dev/null 2>&1
+	"${@}"
 
 # return to old working dir
 cd "${OLDPWD}"
@@ -173,7 +172,7 @@ EOF
 
 6. Reboot Tails
 
-This is necessary to get the changes to your `persistent volume` into the running system. Remember to set an administration password for Tails again after reboot.
+This is necessary to get the changes to your `persistent volume` into the running system. Remember to set an [administration password](https://tails.boum.org/administration_password/) for Tails again after reboot.
 
 7. Start VerusCoin
 
@@ -182,3 +181,4 @@ veruscoind -daemon 1>/dev/null 2>&1
 tail -f ~/Persistent/VerusCoin/debug.log
 ```
 
+*Congratulations, you have reached the end of this howto guide.*

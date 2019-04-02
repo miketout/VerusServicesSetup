@@ -65,7 +65,6 @@ These custom scripts are necessary because we have to set another data directory
 
 **`veruscoin-cli`**
 
-```
 Copy this into `/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli`:
 ```
 #!/bin/bash

@@ -58,7 +58,8 @@ These custom scripts are necessary because we have to set another data directory
 **`veruscoin-cli`**
 
 ```
-cat <<EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
+Copy this into `/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli`:
+```
 #!/bin/bash
 
 ${HOME}/bin/komodo-cli \
@@ -73,8 +74,8 @@ chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 
 *When run, this will ask for your Tails administration password multiple times in order to check/set `iptables` rules. This is necessary in order to allow any communication from and to the wallet at all.*
 
+Copy this into `/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind`:
 ```
-cat <<EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind
 #!/bin/bash -x
 
 # save current working dir for later

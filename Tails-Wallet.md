@@ -27,7 +27,7 @@ sudo apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib aut
 git clone https://github.com/veruscoin/veruscoin
 cd veruscoin
 ./zcutil/build.sh -j$(nproc)
-strip src/komodod src/komodo-cli src/komodo-tx
+strip src/komodod src/komodo-cli
 ```
 
 Copy over these files: 
@@ -48,7 +48,7 @@ cd /live/persistence/TailsData_unlocked/
 mkdir dotfiles/bin
 ```
 
-Copy over `komodod`, `komodo-cli`, `komodo-tx` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin`
+Copy over `komodod`, `komodo-cli` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin`
 
 2. Create custom `veruscoin-cli` and `veruscoind` scripts
 

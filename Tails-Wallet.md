@@ -21,7 +21,7 @@ For reference, here's a quick cheatsheet for building on Debian-ish systems:
 
 ```
 sudo apt update
-apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib autoconf \
+sudo apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib autoconf \
 	libtool ncurses-dev unzip git python python-zmq zlib1g-dev wget \
 	libcurl4-openssl-dev bsdmainutils automake curl
 git clone https://github.com/veruscoin/veruscoin
@@ -33,7 +33,6 @@ strip src/komodod src/komodo-cli src/komodo-tx
 Copy over these files: 
 ```
 veruscoin/src/komodod
-veruscoin/src/komodo-tx
 veruscoin/src/komodo-cli
 veruscoin/zcutil/fetch-params.sh
 ```

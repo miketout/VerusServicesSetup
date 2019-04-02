@@ -98,7 +98,7 @@ fi
 # check if port is already opened, open if not
 PORTCHECK=$(/usr/bin/sudo /sbin/iptables -L | /bin/grep ${RPCPORT})
 if [ -z "${PORTCHECK}" ]; then
-	/usr/bin/sudo /sbin/iptables -I OUTPUT -o lo -p tcp --dport ${RPCPORT} -j ACCEPT
+	/usr/bin/sudo /sbin/iptables -I OUTPUT -o lo -p tcp -s 127.0.0.1 -d 127.0.0.1 --dport ${RPCPORT} -j ACCEPT
 fi
 
 # change working dir to verus datadir

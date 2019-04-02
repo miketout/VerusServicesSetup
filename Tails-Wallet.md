@@ -50,7 +50,7 @@ mkdir /live/persistence/TailsData_unlocked/dotfiles/bin
 cp ~/.bashrc /live/persistence/TailsData_unlocked/dotfiles
 ```
 
-Edit `/live/persistence/TailsData_unlocked/dotfiles` with your favourite text editor, put this at the end: 
+Edit `/live/persistence/TailsData_unlocked/dotfiles/.bashrc` with your favourite text editor, put this at the end: 
 
 ```
 PATH=${PATH}:/home/amnesia/bin

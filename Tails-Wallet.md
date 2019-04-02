@@ -108,6 +108,7 @@ cd ${HOME}/Persistent/VerusCoin
 ${HOME}/bin/komodod \
 	-datadir=${HOME}/Persistent/VerusCoin \
 	-ac_name=VRSC \
+	-printtoconsole=1 \
 	-ac_algo=verushash \
 	-ac_cc=1 \
 	-ac_supply=0 \

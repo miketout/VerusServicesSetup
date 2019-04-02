@@ -43,10 +43,18 @@ veruscoin/zcutil/fetch-params.sh
 
 Execute below steps in order to integrate the wallet into your Tails installation.
 
-1. Create persistent `bin` dir.
+1. Create persistent `bin` dir and add it to path.
 
 ```
 mkdir /live/persistence/TailsData_unlocked/dotfiles/bin
+cp ~/.bashrc /live/persistence/TailsData_unlocked/dotfiles
+```
+
+Edit `/live/persistence/TailsData_unlocked/dotfiles` with your favourite text editor, put this at the end: 
+
+```
+PATH=${PATH}:/home/amnesia/bin
+export PATH
 ```
 
 Copy over `komodod`, `komodo-cli` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin` and make sure all files are `chmod +x`.
@@ -66,9 +74,9 @@ ${HOME}/bin/komodo-cli \
 	-datadir=${HOME}/Persistent/VerusCoin \
 	-ac_name=VRSC \
 	"$@"
-EOF
-chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 ```
+
+Afterwards, `chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli` to make it executeable.
 
 **`veruscoind`**
 
@@ -117,8 +125,9 @@ ${HOME}/bin/komodod \
 
 # return to old working dir
 cd "${OLDPWD}"
-EOF
 ```
+
+Afterwards, `chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind` to make it executable.
 
 3. Download `zcash-params` and move to `dotfiles` directory
 

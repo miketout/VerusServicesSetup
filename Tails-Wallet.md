@@ -37,6 +37,8 @@ veruscoin/src/komodo-cli
 veruscoin/zcutil/fetch-params.sh
 ```
 
+**NOTE: Should you choose option 1, use the preinstalled `GtkHash` tool to verify the checksums of your download.**
+
 ## Integrate wallet into Tails
 
 Execute below steps in order to integrate the wallet into your Tails installation.
@@ -56,7 +58,7 @@ These custom scripts are necessary because we have to set another data directory
 **`veruscoin-cli`**
 
 ```
-cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
+cat <<EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 #!/bin/bash
 
 ${HOME}/bin/komodo-cli \
@@ -72,7 +74,7 @@ chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli
 *When run, this will ask for your Tails administration password multiple times in order to check/set `iptables` rules. This is necessary in order to allow any communication from and to the wallet at all.*
 
 ```
-cat << EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind
+cat <<EOF >/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind
 #!/bin/bash -x
 
 # save current working dir for later

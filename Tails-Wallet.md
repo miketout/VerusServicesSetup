@@ -130,6 +130,8 @@ Afterwards, `chmod +x /live/persistence/TailsData_unlocked/dotfiles/bin/veruscoi
 
 3. Download `zcash-params` and move to `dotfiles` directory
 
+If you downloaded the binaries from [veruscoin.io](https://veruscoin.io), adapt below to `fetch-params` instead of `fetch-params.sh`.
+
 ```
 cd ~
 /live/persistence/TailsData_unlocked/dotfiles/bin/fetch-params.sh

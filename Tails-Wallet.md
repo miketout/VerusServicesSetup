@@ -8,7 +8,7 @@ This document describes a way to run a VerusCoin native wallet from within [Tail
 
 Get a USB stick, at least 32GB in size, preferrably USB3. Follow [this guide](https://tails.boum.org/install/) to install the most recent release of Tails onto that USB stick.
 
-To be able to complete this guide (and use VerusCoin afterwards), you will have to set an [administration password](https://tails.boum.org/administration_password/) for Tails on every boot. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
+To be able to complete this guide as well as anytime you want to use your VerusCoin wallet, you will have to set an [administration password](https://tails.boum.org/administration_password/) for Tails. Also, you need a `persistent volume` which is set to store at least `Personal Data` and `Dotfiles`.
 
 ## Build/obtain VerusCoin binaries
 

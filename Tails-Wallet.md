@@ -145,9 +145,9 @@ mv ~/.zcash-params /live/persistence/TailsData_unlocked/dotfiles
 
 ```
 mkdir -p ${HOME}/Persistent/VerusCoin/export; cd ${HOME}/Persistent/VerusCoin
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.md5sum
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.sha256sum
+wget http://bootstrapslc3ttl.onion/veruscoin/VRSC-bootstrap.tar.gz
+wget http://bootstrapslc3ttl.onion/veruscoin/VRSC-bootstrap.tar.gz.md5sum
+wget http://bootstrapslc3ttl.onion/veruscoin/VRSC-bootstrap.tar.gz.sha256sum
 tar zxf VRSC-bootstrap.tar.gz
 ```
 
@@ -181,6 +181,7 @@ rpcworkqueue=4
 addnode=qxgvbauwyxshhp46.onion:27485
 addnode=ndy4q5hqvgrq3moe.onion:27485
 addnode=av3hnhrk5hhojvd2.onion:27485
+addnode=qi65jg5qdfczziyl.onion:27485
 EOF
 ```
 

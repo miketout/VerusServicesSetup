@@ -60,7 +60,7 @@ rm VRSC-bootstrap.tar.gz
 ```
 
 Create `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
-A resonably secure `rpcpassword` can be generated using this command: 
+A resonably secure `rpcpassword` can be generated using this command:
 `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
 
 ```
@@ -114,7 +114,7 @@ seednode=185.25.48.72:27485
 seednode=185.25.48.72:27487
 ```
 
-Afterwards, start the daemon again and let it sync the blockchain: 
+Afterwards, start the daemon again and let it sync the blockchain:
 
 ```
 komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
@@ -131,7 +131,7 @@ komodo-cli -ac_name=VRSC getinfo
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
-## Redis 
+## Redis
 
 Switch back to the `root` account by typing `exit` or hitting `CTRL-D`. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
 
@@ -140,16 +140,47 @@ bind 127.0.0.1
 appendonly yes
 ```
 
-Set `redis-server` to start at bootup and start it manually: 
+Set amount of connections to 1024 (or 65535 if you think you need it) instead of the standard 128:
+```
+sudo nano /etc/rc.local
+```
+and add the following line:
+```
+sysctl -w net.core.somaxconn=1024
+```
+
+Set the overcommet_memory feature to 1, to avoid loss of data in case of nut enough memory:
+```
+echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
+```
+And use the following command to activate it immediately
+```
+sysctl vm.overcommit_memory=1
+```
+
+Finally disable Transparent Huge Page:
+```
+nano /etc/default/grub.d/no_thp.cfg
+```
+add this to the empty file:
+```
+GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT transparent_hugepage=never"
+```
+And activate it without the need for a reboot:
+```
+sudo update-grub
+```
+
+Set `redis-server` to start at bootup and start it manually:
 
 ```
 update-rc.d redis-server enable
-/etc/init.d/redis start
+/etc/init.d/redis-server start
 ```
 
 ## Node.js
 
-Still as `root`, install Node.js v8 like this: 
+Still as `root`, install Node.js v8 like this:
 
 ```
 curl -sL https://deb.nodesource.com/setup_8.x | bash -
@@ -166,13 +197,13 @@ npm -g install pm2
 
 ## S-NOMP
 
-S-NOMP and some of its dependencies will need additional packages in order to be built successfully: 
+S-NOMP and some of its dependencies will need additional packages in order to be built successfully:
 
 ```
 apt -y install libboost-all-dev libsodium-dev
 ```
 
-Create a new user account to run S-NOMP from. Switch to that user and clone S-NOMP from miketouts repository: 
+Create a new user account to run S-NOMP from. Switch to that user and clone S-NOMP from miketouts repository:
 
 ```
 useradd -m -d /home/s-nomp -s /bin/bash s-nomp
@@ -180,7 +211,7 @@ su - s-nomp
 git clone https://github.com/veruscoin/s-nomp
 ```
 
-In `package.json`, change the `stratum-pool` dependency to `git+https://github.com/miketout/node-stratum-pool.git`. Next, install all dependencies using `npm`: 
+In `package.json`, change the `stratum-pool` dependency to `git+https://github.com/miketout/node-stratum-pool.git`. Next, install all dependencies using `npm`:
 
 ```
 npm update
@@ -194,7 +225,7 @@ cd ~/s-nomp
 perl -p -i -e 's/Sol\/s/H\/s/g' libs/stats.js website/pages/stats.html website/static/stats.js website/static/miner_stats.js
 ```
 
-In the web dashboard of the pool there is a 'Pool Luck' display which gives a rough estimate of how much time will pass between found blocks. To improve the accuracy of this number, change the value of `_blocktime` in line `584` of `libs/stats.js` to be closer to the actual block target of VerusCoin: 
+In the web dashboard of the pool there is a 'Pool Luck' display which gives a rough estimate of how much time will pass between found blocks. To improve the accuracy of this number, change the value of `_blocktime` in line `584` of `libs/stats.js` to be closer to the actual block target of VerusCoin:
 
 ```
 cd ~/s-nomp
@@ -203,7 +234,7 @@ perl -p -i -e 's/_blocktime = 160/_blocktime = 55/g' libs/stats.js
 
 
 
-Locate the `verushash` module directory. It either is `/home/s-nomp/node_modules/verushash` or `/home/s-nomp/node_modules/stratum_pool/node_modules/verushash`. In this directory, create a file called `index.json` containing this: 
+Locate the `verushash` module directory. It either is `/home/s-nomp/node_modules/verushash` or `/home/s-nomp/node_modules/stratum_pool/node_modules/verushash`. In this directory, create a file called `index.json` containing this:
 
 ```
 module.exports = require('bindings')('verushash.node');
@@ -219,7 +250,7 @@ komodo-cli -ac_name=VRSC getnewaddress
 komodo-cli -ac_name=VRSC z_getnewaddress
 ```
 
-Next, we will dump the private keys of these addresses for safety reasons. For the public addresses, use 
+Next, we will dump the private keys of these addresses for safety reasons. For the public addresses, use
 
 ```
 komodo-cli -ac_name=VRSC dumpprivkey <public VerusCoin address>
@@ -238,7 +269,7 @@ Now, switch to the `s-nomp` account. First, copy `~/s-nomp/config_example.json` 
   * Under `clustering`, set `enabled` to `false`, **otherwise [PM2](http://pm2.keymetrics.io) fails to work.**
   * Set `stratumHost` to the external IP or DNS name of your server.
 
-Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itself. Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below. 
+Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itself. Now create a pool config. Copy `~/s-nomp/pool_configs/examples/kmd.json` to `~/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below.
 
  * Set `enabled` to `true`.
  * Set `coin` to `vrsc.json`.
@@ -253,9 +284,9 @@ Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itse
  * Set `minDiff` to `16384`.
  * Set `maxDiff` to `2147483648`
 
-We are almost done now. Using the command mentioned at the beginning of this document, check if the blockchain has finished syncing. If not, wait for it to complete before continuing. 
+We are almost done now. Using the command mentioned at the beginning of this document, check if the blockchain has finished syncing. If not, wait for it to complete before continuing.
 
-Now switch to the `veruscoin` user, stop the wallet once more. 
+Now switch to the `veruscoin` user, stop the wallet once more.
 
 ```
 komodo-cli -ac_name=VRSC stop
@@ -267,17 +298,17 @@ Edit `~/.komodo/VRSC/VRSC.conf` and add the blocknotify command below.
 blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %s
 ```
 
-Restart the wallet using the command already listed above. If you are not using `STDOUT`/`STDERR`-redirection, you will see errors about blocknotify. These are expected, because the pool is not running yet and thus the blocknotify script cannot complete successfully. 
+Restart the wallet using the command already listed above. If you are not using `STDOUT`/`STDERR`-redirection, you will see errors about blocknotify. These are expected, because the pool is not running yet and thus the blocknotify script cannot complete successfully.
 
 
-Switch to the `s-nomp` user. Then start the pool using `pm2`: 
+Switch to the `s-nomp` user. Then start the pool using `pm2`:
 
 ```
 cd ~/s-nomp
 pm2 start init.js --name s-nomp
 ```
 
-Use `pm2 log` to check for S-NOMP startup errors. 
+Use `pm2 log` to check for S-NOMP startup errors.
 
 If you completed all steps correctly, the web dashboard on your pool can be reached via port `8080` on the external IP or the DNS name of your server.
 
@@ -298,7 +329,7 @@ ssh-keygen -T /etc/ssh/moduli -f "/root/module.candidates"
 rm "/root/moduli.candidates"
 ```
 
-Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this: 
+Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this:
 
 ```
 cd /etc/ssh
@@ -307,7 +338,7 @@ ssh-keygen -t ed25519 -f ssh_host_ed25519_key < /dev/null
 ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key < /dev/null
 ```
 
-To finish, restart the ssh server: 
+To finish, restart the ssh server:
 
 ```
 /etc/init.d/sshd restart
@@ -319,14 +350,14 @@ You should consider putting the webdashboard of your pool behind some CDN. A fre
 
 ### Reverse-proxying S-NOMP behind `nginx`
 
-As `root`, install `nginx` and enable it on boot using these commands: 
+As `root`, install `nginx` and enable it on boot using these commands:
 
 ```
 apt -y install nginx
 update-rc.d enable nginx
 ```
 
-Create `/etc/nginx/blockuseragents.rules` with these contents: 
+Create `/etc/nginx/blockuseragents.rules` with these contents:
 
 ```
 map $http_user_agent $blockedagent {
@@ -339,7 +370,7 @@ default         0;
 }
 ```
 
-Edit `/etc/nginx/sites-available/default` to look like this: 
+Edit `/etc/nginx/sites-available/default` to look like this:
 
 ```
 include /etc/nginx/blockuseragents.rules;
@@ -369,13 +400,13 @@ server {
 }
 ```
 
-Restart `nginx`: 
+Restart `nginx`:
 
 ```
 /etc/init.d/nginx restart
 ```
 
-Switch to the `s-nomp` user, edit `/home/s-nomp/s-nomp/config.json` to bind the web interface to `127.0.0.1:8080`: 
+Switch to the `s-nomp` user, edit `/home/s-nomp/s-nomp/config.json` to bind the web interface to `127.0.0.1:8080`:
 
 ```
 [...]
@@ -387,7 +418,7 @@ Switch to the `s-nomp` user, edit `/home/s-nomp/s-nomp/config.json` to bind the 
 
 ```
 
-Restart the pool: 
+Restart the pool:
 
 ```
 pm2 restart s-nomp
@@ -397,7 +428,7 @@ If you've followed the above steps correctly, your pool's webdashboard is now pr
 
 ### Disable unused webdashboard pages
 
-Change to the `s-nomp` account. Edit `/home/s-nomp/libs/website.js` to have the `pageFiles` array look like below: 
+Change to the `s-nomp` account. Edit `/home/s-nomp/libs/website.js` to have the `pageFiles` array look like below:
 
 ```
 var pageFiles = {
@@ -415,7 +446,7 @@ var pageFiles = {
 
 ### Link to the `payments` page
 
-Change to the `s-nomp` user account. Edit `/home/s-nomp/website/index.html` to include a new link at the right position, which is somewhere in between lines `30-70`: 
+Change to the `s-nomp` user account. Edit `/home/s-nomp/website/index.html` to include a new link at the right position, which is somewhere in between lines `30-70`:
 
 ```
 <header>
@@ -430,9 +461,9 @@ Change to the `s-nomp` user account. Edit `/home/s-nomp/website/index.html` to i
 </header>
 ```
 
-### Enable `logrotate` 
+### Enable `logrotate`
 
-As `root` user, create a file called `/etc/logrotate.d/pool` with these contents: 
+As `root` user, create a file called `/etc/logrotate.d/pool` with these contents:
 
 ```
 /home/veruscoin/.komodo/VRSC/debug.log
@@ -457,7 +488,7 @@ Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and includ
 @reboot /home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
 ```
 
-Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below:
+Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below (Note that the sleep 60 is the delay so other services can start first. If your server doesn't accept miner connections, unless you restart s-nomp, increase the value up to as much as 600 sec.):
 
 ```
 @reboot /bin/sleep 60 && cd /home/s-nomp/s-nomp && /usr/bin/pm2 start init.js --name s-nomp
@@ -465,7 +496,7 @@ Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include t
 
 ### Simplify wallet usage
 
-Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this: 
+Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this:
 
 ```
 #!/bin/bash
@@ -475,20 +506,20 @@ cd /home/veruscoin/.komodo/VRSC
 cd "${OLDPWD}"
 ```
 
-Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this: 
+Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this:
 
 ```
 #!/bin/bash
 /home/veruscoin/bin/komodo-cli -ac_name=VRSC ${@}
 ```
 
-Make both files executable: 
+Make both files executable:
 
 ```
 chmod +x /home/veruscoin/bin/veruscoin*
 ```
 
-From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands, you can just use them as shown below: 
+From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands, you can just use them as shown below:
 
 ```
 veruscoind -daemon 1>/dev/null 2>&1
@@ -497,7 +528,7 @@ veruscoin-cli addnode 1.2.3.4 onetry
 
 ### Increase open files limit
 
-Add this to your `/etc/security/limits.conf`: 
+Add this to your `/etc/security/limits.conf`:
 
 ```
 * soft nofile 1048576
@@ -511,14 +542,14 @@ Reboot to activate the changes. Alternatively you can make sure all running proc
 
 If your pool is expected to receive a lot of load, consider implementing below changes, all as `root`:
 
-Enable the `tcp_bbr` kernel module: 
+Enable the `tcp_bbr` kernel module:
 
 ```
 modprobe tcp_bbr
 echo tcp_bbr >> /etc/modules
 ```
 
-Edit your `/etc/sysctl.conf` to include below settings: 
+Edit your `/etc/sysctl.conf` to include below settings:
 
 ```
 net.ipv4.tcp_congestion_control=bbr
@@ -544,7 +575,7 @@ net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_limit_output_bytes = 131072
 ```
 
-Run below command to activate the changes, alternatively reboot the machine: 
+Run below command to activate the changes, alternatively reboot the machine:
 
 
 ```
@@ -553,13 +584,13 @@ sysctl -p /etc/sysctl.conf
 
 ### Change swapping behaviour
 
-If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting: 
+If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting:
 
 ```
 vm.swappiness=1
 ```
 
-The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine: 
+The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine:
 
 ```
 sysctl -p /etc/sysctl.conf
@@ -567,7 +598,7 @@ sysctl -p /etc/sysctl.conf
 
 ### Install `redis-commander`
 
-As `root`, install `redis-commander` like this: 
+As `root`, install `redis-commander` like this:
 
 ```
 npm -g install redis-commander
@@ -577,7 +608,7 @@ Consult `redis-commander --help` for more information.
 
 ### Install `molly-guard`
 
-As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this: 
+As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this:
 
 ```
 apt -y install molly-guard

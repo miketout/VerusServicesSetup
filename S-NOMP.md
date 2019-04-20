@@ -131,7 +131,7 @@ komodo-cli -ac_name=VRSC getinfo
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
-## Redis
+## Redis-server
 
 Switch back to the `root` account by typing `exit` or hitting `CTRL-D`. Install Redis using `apt -y install redis-server`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
 
@@ -276,6 +276,7 @@ Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itse
  * Set `address` to one of the public addresses generated before.
  * Set `zAddress` to the z-address generated before.
  * Use the remaining public address for `tAddress`
+ * Set `rewardRecipients` to your fee address and fee percentage. Remove `"": 0.2` if you want 0% fee.
  * Set `paymentInterval` to `180`
  * Set `minimumPayment` to `2`.
  * Set `maxBlocksPerPayment` to `8`.

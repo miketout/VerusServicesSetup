@@ -45,8 +45,8 @@ After that is done, create a `~/bin` directory and copy over the binaries. Strip
 
 ```
 mkdir ~/bin
-cp src/komodod src/komodo-cli src/komodo-tx ~/bin
-strip ~/bin/komodo*
+cp src/verusd src/verus ~/bin
+strip ~/bin/verus*
 ```
 
 Now, lets create the data directory. Then, get the bootstrap and unpack it there.
@@ -60,7 +60,7 @@ rm VRSC-bootstrap.tar.gz
 ```
 
 Create `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
-A resonably secure `rpcpassword` can be generated using this command: 
+A resonably secure `rpcpassword` can be generated using this command:
 `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
 
 ```
@@ -114,26 +114,23 @@ seednode=185.25.48.72:27485
 seednode=185.25.48.72:27487
 ```
 
-For proper Iquidus operation, `txindex=1` is crucial. Afterwards, start the daemon and let it sync the small rest of the blockchain: 
+For proper Iquidus operation, `txindex=1` is crucial. Afterwards, start the daemon and let it sync the small rest of the blockchain:
 
 ```
-komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
--ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 \
--ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 \
--addnode=185.64.105.111 -daemon
+verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon
 ```
 
 To check the status and know when the initial sync has been completed, issue
 
 ```
-komodo-cli -ac_name=VRSC getinfo
+verus getinfo
 ```
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
 ## NodeJS 10 & Prerequisites
 
-Install NodeJS v10 like this: 
+Install NodeJS v10 like this:
 
 ```
 curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -141,7 +138,7 @@ apt update; apt -y upgrade
 apt -y install nodejs
 npm -g install pm2
 ```
-Alternatively, if you'd like to keep all the NodeJS-related data within a user account, you can use [nvm.sh](https://nvm.sh) to install NodeJS into the `veruscoin-explorer` account. See their notes for more info. 
+Alternatively, if you'd like to keep all the NodeJS-related data within a user account, you can use [nvm.sh](https://nvm.sh) to install NodeJS into the `veruscoin-explorer` account. See their notes for more info.
 
 ## Iquidus Installation
 
@@ -152,7 +149,7 @@ useradd -m -d /home/veruscoin-explorer -s /bin/bash veruscoin-explorer
 su - veruscoin-explorer
 ```
 
-Now, check out the Veruscoin Iquidus repo and install it: 
+Now, check out the Veruscoin Iquidus repo and install it:
 
 ```
 git clone https://github.com/VerusCoin/explorer
@@ -163,7 +160,7 @@ cp settings.json.template settings.json
 
 ## Iquidus Configuration
 
-See https://github.com/iquidus/explorer for the list of install instructions of Iquidus. The Genesis block/tx values are: 
+See https://github.com/iquidus/explorer for the list of install instructions of Iquidus. The Genesis block/tx values are:
 
 ```
 //genesis
@@ -180,7 +177,7 @@ Make sure the VerusCoin wallet is running. You should now be able to start Iquid
 cd /home/veruscoin-explorer/explorer; pm2 start --name explorer bin/instance
 ```
 
-Display the logs with this command: 
+Display the logs with this command:
 
 ```
 pm2 log explorer
@@ -209,7 +206,7 @@ ssh-keygen -T /etc/ssh/moduli -f "/root/module.candidates"
 rm "/root/moduli.candidates"
 ```
 
-Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this: 
+Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this:
 
 ```
 cd /etc/ssh
@@ -218,15 +215,15 @@ ssh-keygen -t ed25519 -f ssh_host_ed25519_key < /dev/null
 ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key < /dev/null
 ```
 
-To finish, restart the ssh server: 
+To finish, restart the ssh server:
 
 ```
 /etc/init.d/sshd restart
 ```
 
-### Enable `logrotate` 
+### Enable `logrotate`
 
-As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents: 
+As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents:
 
 ```
 /home/veruscoin/.komodo/VRSC/debug.log
@@ -246,44 +243,12 @@ As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these con
 Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
 
 ```
-@reboot /home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
-```
-
-### Simplify cli usage
-
-Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this: 
-
-```
-#!/bin/bash
-OLDPWD="$(pwd)"
-cd /home/veruscoin/.komodo/VRSC
-/home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 ${@}
-cd "${OLDPWD}"
-```
-
-Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this: 
-
-```
-#!/bin/bash
-/home/veruscoin/bin/komodo-cli -ac_name=VRSC ${@}
-```
-
-Make both files executable: 
-
-```
-chmod +x /home/veruscoin/bin/veruscoin*
-```
-
-From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands, you can just use them as shown below: 
-
-```
-veruscoind -daemon 1>/dev/null 2>&1
-veruscoin-cli addnode 1.2.3.4 onetry
+@reboot /home/veruscoin/bin/verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
 ```
 
 ### Increase open files limit
 
-Add this to your `/etc/security/limits.conf`: 
+Add this to your `/etc/security/limits.conf`:
 
 ```
 * soft nofile 1048576
@@ -297,14 +262,14 @@ Reboot to activate the changes. Alternatively you can make sure all running proc
 
 If your pool is expected to receive a lot of load, consider implementing below changes, all as `root`:
 
-Enable the `tcp_bbr` kernel module: 
+Enable the `tcp_bbr` kernel module:
 
 ```
 modprobe tcp_bbr
 echo tcp_bbr >> /etc/modules
 ```
 
-Edit your `/etc/sysctl.conf` to include below settings: 
+Edit your `/etc/sysctl.conf` to include below settings:
 
 ```
 net.ipv4.tcp_congestion_control=bbr
@@ -330,7 +295,7 @@ net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_limit_output_bytes = 131072
 ```
 
-Run below command to activate the changes, alternatively reboot the machine: 
+Run below command to activate the changes, alternatively reboot the machine:
 
 
 ```
@@ -339,13 +304,13 @@ sysctl -p /etc/sysctl.conf
 
 ### Change swapping behaviour
 
-If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting: 
+If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting:
 
 ```
 vm.swappiness=1
 ```
 
-The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine: 
+The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine:
 
 ```
 sysctl -p /etc/sysctl.conf
@@ -353,7 +318,7 @@ sysctl -p /etc/sysctl.conf
 
 ### Install `molly-guard`
 
-As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this: 
+As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this:
 
 ```
 apt -y install molly-guard

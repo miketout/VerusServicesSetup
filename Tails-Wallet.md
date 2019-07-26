@@ -12,7 +12,7 @@ To be able to complete this guide as well as anytime you want to use your VerusC
 
 ## Build/obtain VerusCoin binaries
 
-For now, `build.sh` sometimes fails via TOR. Appearantly, some download servers of opensource projects do not like TOR exit nodes. **What a shame.** However, that leaves us with 2 options: 
+For now, `build.sh` sometimes fails via TOR. Appearantly, some download servers of opensource projects do not like TOR exit nodes. **What a shame.** However, that leaves us with 2 options:
 
 1. Download and use premade binaries from [veruscoin.io](https://veruscoin.io)
 2. Build the binaries on another system and copy them into your Tails instance.
@@ -30,7 +30,7 @@ cd veruscoin
 strip src/komodod src/komodo-cli
 ```
 
-Copy over these files: 
+Copy over these files:
 ```
 veruscoin/src/komodod
 veruscoin/src/komodo-cli
@@ -50,14 +50,14 @@ mkdir /live/persistence/TailsData_unlocked/dotfiles/bin
 cp ~/.bashrc /live/persistence/TailsData_unlocked/dotfiles
 ```
 
-Edit `/live/persistence/TailsData_unlocked/dotfiles/.bashrc` with your favourite text editor, put this at the end: 
+Edit `/live/persistence/TailsData_unlocked/dotfiles/.bashrc` with your favourite text editor, put this at the end:
 
 ```
 PATH=${PATH}:/home/amnesia/bin
 export PATH
 ```
 
-Copy over `komodod`, `komodo-cli` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin` and make sure all files are `chmod +x`.
+Copy over `verusd`, `verus` and `fetch-params.sh` to `/live/persistence/TailsData_unlocked/dotfiles/bin` and make sure all files are `chmod +x`.
 
 2. Create custom `veruscoin-cli` and `veruscoind` scripts
 
@@ -69,9 +69,8 @@ Copy this into `/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoin-cli`
 ```
 #!/bin/bash
 
-${HOME}/bin/komodo-cli \
+${HOME}/bin/verus \
 	-datadir=${HOME}/Persistent/VerusCoin \
-	-ac_name=VRSC \
 	"$@"
 ```
 
@@ -88,10 +87,10 @@ Copy this into `/live/persistence/TailsData_unlocked/dotfiles/bin/veruscoind`:
 # save current working dir for later
 OLDPWD="$(pwd)"
 
-# determine configured rpcport (or use default value) 
+# determine configured rpcport (or use default value)
 # then open port in firewall
 RPCPORT=$(/bin/cat ${HOME}/Persistent/VerusCoin/VRSC.conf | /bin/grep rpcport | /usr/bin/cut -f2 -d=)
-if [ -z "${RPCPORT}" ] || [ "${RPCPORT}" -neq "${RPCPORT}" ] > /dev/null 2>&1; then 
+if [ -z "${RPCPORT}" ] || [ "${RPCPORT}" -neq "${RPCPORT}" ] > /dev/null 2>&1; then
 	RPCPORT=27486
 fi
 
@@ -105,22 +104,9 @@ fi
 cd ${HOME}/Persistent/VerusCoin
 
 # start veruscoin
-${HOME}/bin/komodod \
+${HOME}/bin/verusd \
 	-datadir=${HOME}/Persistent/VerusCoin \
-	-ac_name=VRSC \
 	-printtoconsole=1 \
-	-ac_algo=verushash \
-	-ac_cc=1 \
-	-ac_supply=0 \
-	-ac_eras=3 \
-	-ac_reward=0,38400000000,2400000000 \
-	-ac_halving=1,43200,1051920 \
-	-ac_decay=100000000,0,0 \
-	-ac_end=10080,226080,0 \
-	-ac_timelockgte=19200000000 \
-	-ac_timeunlockfrom=129600 \
-	-ac_timeunlockto=1180800 \
-	-ac_veruspos=50 \
 	"${@}"
 
 # return to old working dir

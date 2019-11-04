@@ -2,7 +2,7 @@
 
 ## Server
 
-A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores that are able to handle AES-NI is the absolute minimum requirement. Start following the guide while logged in as `root`.
+A VPS with 4GB of RAM, anything above 40GB SSD storage and 2 CPU cores that are able to handle AES-NI is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 
 ## Operating System
@@ -45,8 +45,8 @@ After that is done, create a `~/bin` directory and copy over the binaries. Strip
 
 ```
 mkdir ~/bin
-cp src/komodod src/komodo-cli src/komodo-tx ~/bin
-strip ~/bin/komodo*
+cp src/verusd src/verus src/verus-tx ~/bin
+strip ~/bin/verus*
 ```
 
 Now, lets create the data directory. Then, get the bootstrap and unpack it there.
@@ -117,16 +117,13 @@ seednode=185.25.48.72:27487
 Afterwards, start the daemon again and let it sync the blockchain:
 
 ```
-komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 \
--ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 \
--ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 \
--addnode=185.64.105.111 -daemon
+verusd -daemon
 ```
 
 To check the status and know when the initial sync has been completed, issue
 
 ```
-komodo-cli -ac_name=VRSC getinfo
+verus getinfo
 ```
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
@@ -245,21 +242,21 @@ module.exports = require('bindings')('verushash.node');
 Shielding is required for mined VerusCoins. We will need 2 public and a z-address for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```
-komodo-cli -ac_name=VRSC getnewaddress
-komodo-cli -ac_name=VRSC getnewaddress
-komodo-cli -ac_name=VRSC z_getnewaddress
+verus getnewaddress
+verus getnewaddress
+verus z_getnewaddress
 ```
 
 Next, we will dump the private keys of these addresses for safety reasons. For the public addresses, use
 
 ```
-komodo-cli -ac_name=VRSC dumpprivkey <public VerusCoin address>
+verus dumpprivkey <public VerusCoin address>
 ```
 
 For the z-address, use
 
 ```
-komodo-cli -ac_name=VRSC z_exportkey <VerusCoin z-address>
+verus z_exportkey <VerusCoin z-address>
 ```
 
 **Save the data in an offline location, not on your computer!**
@@ -290,7 +287,7 @@ We are almost done now. Using the command mentioned at the beginning of this doc
 Now switch to the `veruscoin` user, stop the wallet once more.
 
 ```
-komodo-cli -ac_name=VRSC stop
+verus stop
 ```
 
 Edit `~/.komodo/VRSC/VRSC.conf` and add the blocknotify command below.
@@ -486,13 +483,13 @@ As `root` user, create a file called `/etc/logrotate.d/pool` with these contents
 Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
 
 ```
-@reboot /home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
+@reboot /home/veruscoin/bin/verusd -daemon 1>/dev/null 2>&1
 ```
 
-Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below (Note that the sleep 60 is the delay so other services can start first. If your server doesn't accept miner connections, unless you restart s-nomp, increase the value up to as much as 600 sec.):
+Switch to the `s-nomp` user. Edit the `crontab` using `crontab -e` and include the line below (Note that the sleep 300 is the delay so other services can start first. If your server doesn't accept miner connections, unless you restart s-nomp, increase the value up to as much as 600 sec.):
 
 ```
-@reboot /bin/sleep 60 && cd /home/s-nomp/s-nomp && /usr/bin/pm2 start init.js --name s-nomp
+@reboot /bin/sleep 300 && cd /home/s-nomp/s-nomp && /usr/bin/pm2 start init.js --name s-nomp
 ```
 
 ### Simplify wallet usage
@@ -503,7 +500,7 @@ Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/verusc
 #!/bin/bash
 OLDPWD="$(pwd)"
 cd /home/veruscoin/.komodo/VRSC
-/home/veruscoin/bin/komodod -ac_name=VRSC -ac_algo=verushash -ac_cc=1 -ac_veruspos=50 -ac_supply=0 -ac_eras=3 -ac_reward=0,38400000000,2400000000 -ac_halving=1,43200,1051920 -ac_decay=100000000,0,0 -ac_end=10080,226080,0 -ac_timelockgte=19200000000 -ac_timeunlockfrom=129600 -ac_timeunlockto=1180800 -addnode=185.25.48.236 -addnode=185.64.105.111 ${@}
+/home/veruscoin/bin/verusd ${@}
 cd "${OLDPWD}"
 ```
 
@@ -511,7 +508,7 @@ Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like t
 
 ```
 #!/bin/bash
-/home/veruscoin/bin/komodo-cli -ac_name=VRSC ${@}
+/home/veruscoin/bin/verus ${@}
 ```
 
 Make both files executable:
@@ -520,7 +517,7 @@ Make both files executable:
 chmod +x /home/veruscoin/bin/veruscoin*
 ```
 
-From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands, you can just use them as shown below:
+From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands (both these commands are deprecated), you can just use them as shown below:
 
 ```
 veruscoind -daemon 1>/dev/null 2>&1

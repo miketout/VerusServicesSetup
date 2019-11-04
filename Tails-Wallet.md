@@ -27,13 +27,13 @@ sudo apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib aut
 git clone https://github.com/veruscoin/veruscoin
 cd veruscoin
 ./zcutil/build.sh -j$(nproc)
-strip src/komodod src/komodo-cli
+strip src/verusd src/verus
 ```
 
 Copy over these files:
 ```
-veruscoin/src/komodod
-veruscoin/src/komodo-cli
+veruscoin/src/verusd
+veruscoin/src/verus
 veruscoin/zcutil/fetch-params.sh
 ```
 

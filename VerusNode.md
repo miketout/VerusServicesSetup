@@ -1,20 +1,20 @@
-# Iquidus Explorer for VerusCoin
+# Verus Node with staking wallet 
 
 ## Server
 
-A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
+A VPS with 2GB of RAM, anything above 30GB SSD storage and 2 CPU cores that are able to handle AES-NI is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 
 ## Operating System
 
-This guide is tailored to and tested on `Debian 9 "Stretch"`. Before starting, please install the latest updates:
+This guide tailored to and tested on `Debian 9 "Stretch"`. Before starting, please install the latest updates:
 
 ```
 apt update
 apt -y upgrade
 ```
 
-## Wallet
+## Poolwallet
 
 The packages required in order to compile a VerusCoin wallet can be installed like this:
 
@@ -45,7 +45,7 @@ After that is done, create a `~/bin` directory and copy over the binaries. Strip
 
 ```
 mkdir ~/bin
-cp src/verusd src/verus ~/bin
+cp src/verusd src/verus src/verus-tx ~/bin
 strip ~/bin/verus*
 ```
 
@@ -68,9 +68,6 @@ server=1
 listen=1
 listenonion=0
 maxconnections=256
-
-# wallet is not needed
-disablewallet=1
 
 # logging related options
 logtimestamps=1
@@ -99,11 +96,14 @@ rpcworkqueue=1024
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
 
+# blocknotify
+blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %s
+
 # if a peer jacks up more than 25 times in a row, ban it
 banscore=25
 
-# make sure gen is off
-gen=0
+# stake if possible, although it's probably not helping much
+mint=1
 
 # addnodes
 seednode=185.25.48.236:27485
@@ -114,10 +114,10 @@ seednode=185.25.48.72:27485
 seednode=185.25.48.72:27487
 ```
 
-For proper Iquidus operation, `txindex=1` is crucial. Afterwards, start the daemon and let it sync the small rest of the blockchain:
+Afterwards, start the daemon again and let it sync the blockchain:
 
 ```
-verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon
+verusd -daemon
 ```
 
 To check the status and know when the initial sync has been completed, issue
@@ -128,65 +128,26 @@ verus getinfo
 
 When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
 
-## NodeJS 10 & Prerequisites
+## Configuration Instructions
 
-Install NodeJS v10 like this:
-
-```
-curl -sL https://deb.nodesource.com/setup_10.x | bash -
-apt update; apt -y upgrade
-apt -y install nodejs
-npm -g install pm2
-```
-Alternatively, if you'd like to keep all the NodeJS-related data within a user account, you can use [nvm.sh](https://nvm.sh) to install NodeJS into the `veruscoin-explorer` account. See their notes for more info.
-
-## Iquidus Installation
-
-Create a new user account for the explorer and switch to it.
+Shielding is required for mined / staked VerusCoins. We will need a public and a z-address for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```
-useradd -m -d /home/veruscoin-explorer -s /bin/bash veruscoin-explorer
-su - veruscoin-explorer
+verus getnewaddress
+verus z_getnewaddress
 ```
 
-Now, check out the Veruscoin Iquidus repo and install it:
+Next, we will dump the private keys of these addresses for safety reasons.
+For the public address, use
 
 ```
-git clone https://github.com/VerusCoin/explorer
-cd explorer
-npm install
-cp settings.json.template settings.json
+verus dumpprivkey <public VerusCoin address>
 ```
 
-## Iquidus Configuration
-
-See https://github.com/iquidus/explorer for the list of install instructions of Iquidus. The Genesis block/tx values are:
+For the z-address, use
 
 ```
-//genesis
-"genesis_block": "027e3758c3a65b12aa1046462b486d0a63bfa1beae327897f56c5cfb7daaae71",
-"genesis_tx": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-```
-
-You may want to disable the `twitter` and `markets` display. You should only bind Iquidus to loopback and proxy this to the world with nginx.
-
-
-Make sure the VerusCoin wallet is running. You should now be able to start Iquidus.
-
-```
-cd /home/veruscoin-explorer/explorer; pm2 start --name explorer bin/instance
-```
-
-Display the logs with this command:
-
-```
-pm2 log explorer
-```
-
-Initial sync will take up to 3 hours to complete. Start it like this:
-
-```
-cd /home/veruscoin-explorer/explorer && node scripts/sync.js index reindex
+verus z_exportkey <VerusCoin z-address>
 ```
 
 ## Further considerations
@@ -221,29 +182,44 @@ To finish, restart the ssh server:
 /etc/init.d/sshd restart
 ```
 
-### Enable `logrotate`
-
-As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents:
-
-```
-/home/veruscoin/.komodo/VRSC/debug.log
-{
-  rotate 14
-  daily
-  compress
-  delaycompress
-  copytruncate
-  missingok
-  notifempty
-}
-```
-
 ### Autostart using `cron`
 
 Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
 
 ```
-@reboot /home/veruscoin/bin/verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
+@reboot /home/veruscoin/bin/verusd -daemon 1>/dev/null 2>&1
+```
+
+### Simplify wallet usage
+
+Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this:
+
+```
+#!/bin/bash
+OLDPWD="$(pwd)"
+cd /home/veruscoin/.komodo/VRSC
+/home/veruscoin/bin/verusd ${@}
+cd "${OLDPWD}"
+```
+
+Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this:
+
+```
+#!/bin/bash
+/home/veruscoin/bin/verus ${@}
+```
+
+Make both files executable:
+
+```
+chmod +x /home/veruscoin/bin/veruscoin*
+```
+
+From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands (both these commands are deprecated), you can just use them as shown below:
+
+```
+veruscoind -daemon 1>/dev/null 2>&1
+veruscoin-cli addnode 1.2.3.4 onetry
 ```
 
 ### Increase open files limit
@@ -257,50 +233,6 @@ Add this to your `/etc/security/limits.conf`:
 
 Reboot to activate the changes. Alternatively you can make sure all running processes are restarted from within a shell that has been launched _after_ the above changes were put in place.
 
-
-### Networking optimizations
-
-If your pool is expected to receive a lot of load, consider implementing below changes, all as `root`:
-
-Enable the `tcp_bbr` kernel module:
-
-```
-modprobe tcp_bbr
-echo tcp_bbr >> /etc/modules
-```
-
-Edit your `/etc/sysctl.conf` to include below settings:
-
-```
-net.ipv4.tcp_congestion_control=bbr
-net.core.rmem_default = 1048576
-net.core.wmem_default = 1048576
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
-net.ipv4.tcp_rmem = 4096 87380 16777216
-net.ipv4.tcp_wmem = 4096 65536 16777216
-net.ipv4.udp_rmem_min = 16384
-net.ipv4.udp_wmem_min = 16384
-net.core.netdev_max_backlog = 262144
-net.ipv4.tcp_max_orphans = 262144
-net.ipv4.tcp_max_syn_backlog = 262144
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_max_tw_buckets = 2000000
-net.ipv4.ip_local_port_range = 16001 65530
-net.core.somaxconn = 20480
-net.ipv4.tcp_low_latency = 1
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_fastopen = 3
-net.ipv4.tcp_limit_output_bytes = 131072
-```
-
-Run below command to activate the changes, alternatively reboot the machine:
-
-
-```
-sysctl -p /etc/sysctl.conf
-```
 
 ### Change swapping behaviour
 

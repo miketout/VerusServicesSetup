@@ -49,7 +49,7 @@ cp src/verusd src/verus src/verus-tx ~/bin
 strip ~/bin/verus*
 ```
 
-**NOTICE:** sadly, at the moment `GCC8` doesn't produce proper binaries. If your distribution comes with `GCC8`, feel free to use the [https://github.com/VerusCoin/VerusCoin/releases/download/v0.5.9-2/Verus-CLI-Linux-v0.5.9-2.tar.gz](official Verus binaries) and their [https://github.com/VerusCoin/VerusCoin/releases/download/v0.5.9-2/Verus-CLI-Linux-v0.5.9-2.tar.gz.sha256](checksum). Use the checksum to verify your download, then unpack the downloaded archive and move all executable files from the resulting `verus-cli/` directory to your `~/bin` directory.
+**NOTICE:** sadly, at the moment `GCC8` doesn't produce proper binaries. If your distribution comes with `GCC8`, feel free to use the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases/download/v0.5.9-2/Verus-CLI-Linux-v0.5.9-2.tar.gz) and their [checksum](https://github.com/VerusCoin/VerusCoin/releases/download/v0.5.9-2/Verus-CLI-Linux-v0.5.9-2.tar.gz.sha256). Use the checksum to verify your download, then unpack the downloaded archive and move all executable files from the resulting `verus-cli/` directory to your `~/bin` directory.
 
 Now, lets create the data directory. Then, get the bootstrap and unpack it there.
 

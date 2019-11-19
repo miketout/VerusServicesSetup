@@ -79,12 +79,6 @@ shrinkdebugfile=0
 # how many blocks to check on startup
 checkblocks=64
 
-# indexing options
-txindex=1
-addressindex=1
-timestampindex=1
-spentindex=1
-
 # make sure ipv4 & ipv6 is used
 bind=0.0.0.0
 bind=::
@@ -116,13 +110,13 @@ seednode=185.25.48.72:27485
 seednode=185.25.48.72:27487
 ```
 
-Afterwards, start the daemon again and let it sync the blockchain:
+Afterwards, start the daemon again and let it sync the blockchain. We'll also watch the debug log for a moment:
 
 ```
-verusd -daemon
+cd ~/.komodo/VRSC; verusd -daemon 1>/dev/null 2>&1; tail -f debug.log
 ```
 
-To check the status and know when the initial sync has been completed, issue
+Press `ctrl-c` to exit `tail` if it looks allright. To check the status and know when the initial sync has been completed, issue
 
 ```
 verus getinfo
@@ -148,7 +142,7 @@ and add the following line:
 sysctl -w net.core.somaxconn=1024
 ```
 
-Set the overcommet_memory feature to 1, to avoid loss of data in case of nut enough memory:
+Set the overcommit_memory feature to 1, to avoid loss of data in case of not enough memory:
 ```
 echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
 ```

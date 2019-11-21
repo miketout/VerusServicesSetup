@@ -274,7 +274,7 @@ Note that [PM2](http://pm2.keymetrics.io) will take care of `clustering` by itse
  * Set `minimumPayment` to `2`.
  * Set `maxBlocksPerPayment` to `8`.
  * There are 2 occurences of `user`, `password` and `port` each. Use the `rpcuser`, `rpcpassword` and `rpcport` values from `/home/veruscoin/.komodo/VRSC/VRSC.conf`.
- * Set `diff` to `131072`.
+ * Set `diff` to `8192`.
  * Set `minDiff` to `16384`.
  * Set `maxDiff` to `2147483648`
 

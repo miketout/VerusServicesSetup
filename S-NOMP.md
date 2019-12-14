@@ -276,7 +276,7 @@ which node
 /home/pool/.nvm/versions/node/v8.16.2/bin/node
 ```
 
-Change to the resulting directory and create a symlink like below. Then exit this account.
+Change to the resulting directory and create a symlink like below.
 
 ```bash
 cd /home/pool/.nvm/versions/node/v8.16.2/bin
@@ -286,7 +286,7 @@ exit
 
 ## S-NOMP
 
-Switch to user `pool`, clone the S-NOMP from our main repository:
+Nake sure you're in the `pool` account and clone the S-NOMP from our main repository:
 
 ```bash
 su - pool

@@ -33,16 +33,16 @@ useradd -m -d /home/verus -s /bin/bash verus
 su - verus
 ```
 
-Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the latest release and unpack them (v0.6.0-1 used in this example): 
+Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.1 used in this example): 
 
 ```bash
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.0-1/Verus-CLI-Linux-v0.6.0-1-amd64.tar.gz
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.0-1/Verus-CLI-Linux-v0.6.0-1-amd64.tar.gz.sha256
+wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.1/Verus-CLI-Linux-v0.6.1-amd64.tar.gz
+wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.1/Verus-CLI-Linux-v0.6.1-amd64.tar.gz.sha256
 
 # if that doesn't work out OK, something is wrong. Re-download and/or report to discord please.
-sha256sum -c Verus-CLI-Linux-v0.6.0-1-amd64.tar.gz.sha256
+sha256sum -c Verus-CLI-Linux-v0.6.1-amd64.tar.gz.sha256
 
-tar xf Verus-CLI-Linux-v0.6.0-1-amd64.tar.gz
+tar xf Verus-CLI-Linux-v0.6.1-amd64.tar.gz
 ```
 
 Create a `~/bin` directory, move over all executable files.

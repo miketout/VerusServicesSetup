@@ -1,4 +1,4 @@
-# Verus Node with staking wallet 
+# Verus Node with staking wallet
 
 ## Server
 
@@ -14,7 +14,7 @@ apt update
 apt -y upgrade
 ```
 
-## Poolwallet
+## wallet
 
 The packages required in order to compile a VerusCoin wallet can be installed like this:
 
@@ -54,8 +54,8 @@ Now, lets create the data directory. Then, get the bootstrap and unpack it there
 ```
 mkdir -p ~/.komodo/VRSC
 cd ~/.komodo/VRSC
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
-tar zxf VRSC-bootstrap.tar.gz
+wget https://bootstrap.veruscoin.io/VRSC-bootstrap.tar.gz
+tar xf VRSC-bootstrap.tar.gz
 rm VRSC-bootstrap.tar.gz
 ```
 

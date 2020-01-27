@@ -96,9 +96,6 @@ rpcworkqueue=1024
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
 
-# blocknotify
-blocknotify=/usr/bin/node /home/s-nomp/s-nomp/scripts/cli.js blocknotify verus %s
-
 # if a peer jacks up more than 25 times in a row, ban it
 banscore=25
 

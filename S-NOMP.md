@@ -33,16 +33,14 @@ useradd -m -d /home/verus -s /bin/bash verus
 su - verus
 ```
 
-Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.1 used in this example): 
+Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.2-1used in this example): 
 
 ```bash
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.1/Verus-CLI-Linux-v0.6.1-amd64.tar.gz
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.1/Verus-CLI-Linux-v0.6.1-amd64.tar.gz.sha256
-
-# if that doesn't work out OK, something is wrong. Re-download and/or report to discord please.
-sha256sum -c Verus-CLI-Linux-v0.6.1-amd64.tar.gz.sha256
-
-tar xf Verus-CLI-Linux-v0.6.1-amd64.tar.gz
+wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt
+# if this next command doesn't return `true`, please re-download and/or report to discord. thank you.
+# note, currently the txt file isn't valid json, you'll need to add a `,` at the end of the `signer` line. 
+verus verifyfile "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signer)" "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signature)" $(pwd)/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz
+tar xf Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz 
 ```
 
 Create a `~/bin` directory, move over all executable files.
@@ -71,8 +69,7 @@ Now, lets create the data and wallet export directory. Then, get the bootstrap a
 mkdir ~/export
 mkdir -p ~/.komodo/VRSC
 cd ~/.komodo/VRSC
-wget --continue --retry-connrefused --waitretry=3 --timeout=15 https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz.sha256sum
+wget --continue --retry-connrefused --waitretry=3 --timeout=15 https://bootstrap.veruscoin.io/VRSC-bootstrap.tar.gz https://bootstrap.veruscoin.io/VRSC-bootstrap.tar.gz.sha256sum
 
 # if that doesn't work out OK please redownload or abort and report to discord!
 sha256sum -c VRSC-bootstrap.tar.gz.sha256sum

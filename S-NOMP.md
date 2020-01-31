@@ -48,7 +48,7 @@ Create a `~/bin` directory, move over all executable files.
 ```bash
 mkdir ~/bin
 mv verus-cli/verus* verus-cli/fetch-params ~/bin
-echo PATH=\"${PATH}:/home/verus/bin\" > ~/.bashrc
+echo PATH=\"${PATH}:/home/verus/bin\" >> ~/.bashrc
 ```
 
 Log out of the `verus` account and back into it to get `~/bin` into the `PATH`:

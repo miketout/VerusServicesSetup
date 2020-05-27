@@ -81,7 +81,7 @@ To allow your wallet to setup a hidden service by itself, you have to add the us
 sudo gpasswd -a VERUSCOINUSERNAME debian-tor
 ```
 
-These lines have to go into your `~/.komodo/VRSC/VRSC.conf`. Some may be there already, just change them. 
+These lines have to go into your `~/.komodo/VRSC/VRSC.conf`. Some may be there already, change them to below values.
 
 ```
 listen=1
@@ -98,12 +98,13 @@ Now restart your wallet.
 `tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. For reference, here's a list of 3 TOR VerusCoin endpoints operated by a community member. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
 
 ```
-addnode=qxgvbauwyxshhp46.onion:27485
-addnode=ndy4q5hqvgrq3moe.onion:27485
-addnode=av3hnhrk5hhojvd2.onion:27485
+addnode=3rtskj2oi6afruhd.onion:27485
+addnode=gykuxzbhmg6oyww6.onion:27485
+addnode=76gttxcryr4qwsn6.onion:27485
+addnode=b6y2ox2e7hhjb22m.onion:27485
 ```
 
-You **can** put the onion hostname you extracted from `debug.log` as the `externalip=` into your config file, but it is not strictly necessary. However, you should backup the `~/.komodo/VRSC/onion_private_key` file, its (obviously) the private key to your onion hostname.
+You should backup the `~/.komodo/VRSC/onion_private_key` file along with your `VRSC.conf` and `wallet.dat`, as it is (obviously) the private key to your onion hostname.
 
 ## Conclusion
 

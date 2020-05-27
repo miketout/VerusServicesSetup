@@ -5,5 +5,6 @@
   * [Iquidus](Iquidus.md)
   * [TOR-Wallet](TOR-Wallet.md)
   * [Tails-Wallet](Tails-Wallet.md)
+  * [Verus Staking Node](VerusNode.md) (thanks, Oink)
   
   More guides to follow.

@@ -300,7 +300,7 @@ npm install
 
 ## Configuration Instructions
 
-Shielding is no longer rquired for mined VerusCoins. We will need one public address for this. Switch to the `veruscoin` user and generate the addresses:
+Shielding is no longer required for mined VerusCoins. We will need one public address for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```bash
 verus getnewaddress

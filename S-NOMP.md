@@ -4,7 +4,7 @@ Operating a mining pool requires you to know about systems administration, IT se
 
 **NOTE** When you are done please message `0x03#8822 (ID: 335362302859542531)` (Black-background bald head beardy white avatar, white nick on the [Verus discord](https://discord.gg/VRKMP2S)) with your poolwallet IP so he can `addnode` it around his platform, which contributes to network stability. `Done` in this case means at least full setup procedure completed, pool running, a block was found and paid out. Thank you.
 
-A VPS with 4GB of RAM, anything above 20GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from it's host. See below for an example that will likely lead to trouble. 
+A VPS with 4GB of RAM, anything above 20GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from it's host. See below for an example that will likely lead to trouble.
 
 ```bash
 lscpu|grep -i "model name"
@@ -26,21 +26,21 @@ apt -y install libgomp1 redis-server git libboost-all-dev libsodium-dev build-es
 
 ## Poolwallet
 
-Create a user for the poolwallet, switch to that account: 
+Create a user for the poolwallet, switch to that account:
 
 ```bash
 useradd -m -d /home/verus -s /bin/bash verus
 su - verus
 ```
 
-Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.2-1used in this example): 
+Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.2-1used in this example):
 
 ```bash
 wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt
 # if this next command doesn't return `true`, please re-download and/or report to discord. thank you.
-# note, currently the txt file isn't valid json, you'll need to add a `,` at the end of the `signer` line. 
+# note, currently the txt file isn't valid json, you'll need to add a `,` at the end of the `signer` line.
 verus verifyfile "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signer)" "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signature)" $(pwd)/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz
-tar xf Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz 
+tar xf Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz
 ```
 
 Create a `~/bin` directory, move over all executable files.
@@ -58,7 +58,7 @@ exit
 su - verus
 ```
 
-Now, get the `zcparams` data: 
+Now, get the `zcparams` data:
 
 ```bash
 fetch-params
@@ -266,7 +266,7 @@ nvm install 8
 npm install -g redis-commander pm2
 ```
 
-Because `nvm.sh` comes without it, we need to add one symlink into it's bindir for our installed NodeJS. 
+Because `nvm.sh` comes without it, we need to add one symlink into it's bindir for our installed NodeJS.
 
 ```bash
 which node
@@ -300,24 +300,16 @@ npm install
 
 ## Configuration Instructions
 
-Up until `Verus ID` activation height `800200`, shielding is mandatory for mined VRSC. Afterwards it may still be favourable to do. We will need 2 public and a z-address for this. Switch to the `verus` user and generate the addresses and copy the results:
+Shielding is no longer required for mined VerusCoins. We will need one public address for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```bash
 verus getnewaddress
-verus getnewaddress
-verus z_getnewaddress
 ```
 
 Next, we will dump the private keys of these addresses for safety reasons. For the transparent addresses, use
 
 ```bash
 verus dumpprivkey <Verus T-Address>
-```
-
-For the Z-address, use
-
-```bash
-verus z_exportkey <Verus Z-address>
 ```
 
 **Save the data in an offline location, not on your computer!**
@@ -329,13 +321,22 @@ Now, switch to the `pool` account. First, copy `/home/pool/s-nomp/config_example
 Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.json` to `/home/pool/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below.
 
  * Set `enabled` to `true`.
- * Set `address` to one of the transparent addresses generated before.
- * Set `zAddress` to the zk-address generated before.
- * Use the remaining transparent address for `tAddress`
+ * Set `coin` to `vrsc.json`.
+ * Set `address` to one of the public addresses generated before.
+ * Set `rewardRecipients` to your fee address and fee percentage. Remove `"": 0.2` if you want 0% fee.
+ * Set `paymentInterval` to `180`
+ * Set `minimumPayment` to `2`.
+ * Set `maxBlocksPerPayment` to `8`.
  * Both `rewardRecipients` and `invalidAddress` are set to a Verus Foundation address per default, should you like to keep them intact.
  * **Otherwise make sure you do not use an address from the poolwallet for either `rewardRecipients` or `invalidAddress`**
  * Set `paymentInterval` (in Seconds) and `minimumPayment` (in VRSC) according to your planned scenario.
  * There are 2 occurences of `user`, `password` and `port` each. Use the `rpcuser`, `rpcpassword` and `rpcport` values from `/home/verus/.komodo/VRSC/VRSC.conf`.
+ * Set `diff` to `131072`.
+ * Set `minDiff` to `16384`.
+ * Set `maxDiff` to `2147483648`
+
+Edit the file `~/s-nomp/coins/vrsc.json` to reflect the following setting:
+ * make sure `"requireShielding":false,` is set.
 
 We are almost done now. Using the command mentioned at the beginning of this document, check if the blockchain has finished syncing. If not, wait for it to complete before continuing.
 
@@ -389,7 +390,7 @@ None of the topics below is strictly necessary, but most of them are recommended
 
 ### Useful DNS resolvers
 
-Empty your `/etc/resolv.conf` and replace it with this: 
+Empty your `/etc/resolv.conf` and replace it with this:
 
 ```conf
 # google, https://developers.google.com/speed/public-dns/docs/using

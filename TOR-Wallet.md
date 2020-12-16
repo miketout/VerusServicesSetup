@@ -40,13 +40,7 @@ SOCKSPolicy reject *:*
 ControlPort 9051
 ```
 
-If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine. Feel free to use the config statement below for your TOR pleasure. The specified TOR nodes are operated by a VerusCoin community member.
-
-```
-StrictNodes 1
-EntryNodes 5.9.224.251,136.243.227.142,95.216.104.213,95.216.252.176
-```
-
+If any way possible, compile a list of 'trusted' TOR nodes. Use the `StrictNodes 1` and `EntryNodes [...]` options. Setup `DNSPort` to be `53` and overwrite your `/etc/resolv.conf` with `nameserver 127.0.0.1`. But be careful, screwing this up may lock you out of your server, if you're working on a remote machine. 
 Change to your `/var/lib/tor` directory. We'll do 2 things to make `tor-arm` complain less.
 
 ```
@@ -73,7 +67,7 @@ Now, restart your TOR client.
 sudo /etc/init.d/tor restart
 ```
 
-## Setup the VerusCoin wallet
+## Setup the Verus wallet
 
 To allow your wallet to setup a hidden service by itself, you have to add the user account from which the wallet is running to the `debian-tor` group like so: 
 
@@ -84,25 +78,19 @@ sudo gpasswd -a VERUSCOINUSERNAME debian-tor
 These lines have to go into your `~/.komodo/VRSC/VRSC.conf`. Some may be there already, change them to below values.
 
 ```
-listen=1
+listen=0
 listenonion=1
 onlynet=onion
 bind=127.0.0.1:27485
 proxy=127.0.0.1:9050
+onion=127.0.0.1:9050
 ```
 
 **Most important, remove any `bind=` statement that contains anything else than your loopback IP!!!**
 
 Now restart your wallet.
 
-`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. For reference, here's a list of 3 TOR VerusCoin endpoints operated by a community member. You could put these into your `~/.komodo/VRSC/VRSC.conf` file:
-
-```
-addnode=3rtskj2oi6afruhd.onion:27485
-addnode=gykuxzbhmg6oyww6.onion:27485
-addnode=76gttxcryr4qwsn6.onion:27485
-addnode=b6y2ox2e7hhjb22m.onion:27485
-```
+`tail -f` on the `debug.log` file to make sure your wallet does connect somewhere and gets p2p updates. 
 
 You should backup the `~/.komodo/VRSC/onion_private_key` file along with your `VRSC.conf` and `wallet.dat`, as it is (obviously) the private key to your onion hostname.
 

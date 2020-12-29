@@ -1,6 +1,6 @@
-# Insight Explorer for VerusCoin
+# Insight Explorer for Verus
 
-**NOTE:** For all downloads mentioned below you are encouraged use the [Verus Signature verification tool](https://verus.io/verify-signatures) or a local standalone Verus daemon to make sure the files are authentic and have not been tampered with. Additionally, the setup described below is in no way production ready but is meant to illustrate the general process only. **System hardening, signature verification and other measures are outside of the scope of this guide. You will have to take care of it for yourself!**
+**NOTE:** For all downloads mentioned below you are encouraged use the [Verus Signature verification tool](https://verus.io/verify-signatures) or a local standalone Verus daemon to make sure the files are authentic and have not been tampered with. Additionally, the setup described below is in no way production ready but is meant to illustrate the general process only. **System hardening, firewalling, signature verification and other measures are outside of the scope of this guide. You will have to take care of it for yourself!**
 
 ## Server
 
@@ -8,13 +8,17 @@ A VPS with 4GB of RAM, anything from 20GB SSD storage and 2 CPU cores is the abs
 
 ## Operating System
 
-This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
+This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites. 
 
 ```bash
 apt update
 apt upgrade
-apt dist-upgrade
-apt install wget
+apt install wget libgomp git python build-essential libzmq3-dev
+```
+With the minimum memory requirement above, `dphys-swapfile` will be necessary. It will create a 2GB swap file per default, which is sufficient. In situations where more memory is available, installation of `dphys-swapfile` can be skipped altogether.
+
+```bash
+apt install dphys-swapfile
 ```
 
 ## Verus Node
@@ -176,7 +180,7 @@ nvm install 9
 nvm use 9
 ```
 
-"Globally" (within the `insight` account scope, actually) install `pm2 v4.2.1` and `bitcore-node` as shown below.
+Within the `insight` account scope, globally install `pm2 v4.2.1` and `bitcore-node` as shown below.
 
 ```bash
 npm -g install pm2@4.2.1 git+https://github.com/BloodyNora/bitcore-node-komodo.git
@@ -237,7 +241,6 @@ cat << EOF > ~/insight.VRSC/bitcore-node.json
         }
       ]
     }
-  }
   }
 }
 EOF

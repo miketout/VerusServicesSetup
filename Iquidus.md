@@ -4,7 +4,7 @@
 
 ## Server
 
-A VPS with 4GB of RAM, anything from 20GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
+A VPS with 4GB of RAM, anything from 30GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 ## Operating System
 

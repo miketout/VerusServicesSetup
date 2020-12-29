@@ -239,12 +239,12 @@ To see info about connected clients, execute
 electrumx_rpc sessions
 ```
 
-### Enable `logrotate`
+### Enable `logrotate` for `verusd`
 
-As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents:
+As `root` user, create a file called `/etc/logrotate.d/verus` with these contents:
 
 ```
-/home/veruscoin/.komodo/VRSC/debug.log
+/home/verus/.komodo/VRSC/debug.log
 {
   rotate 14
   daily

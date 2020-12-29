@@ -1,4 +1,4 @@
-# VerusCoin How-To Documents
+# Verus How-To Documents
 
   * [ElectrumX](ElectrumX.md)
   * [S-NOMP](S-NOMP.md)

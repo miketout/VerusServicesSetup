@@ -13,7 +13,7 @@ This guide tailored to and tested on `Debian 10 "Buster"` but should probably al
 ```bash
 apt update
 apt upgrade
-apt install wget libgomp git python build-essential libzmq3-dev
+apt install wget libgomp1 git python build-essential libzmq3-dev
 ```
 With the minimum memory requirement above, `dphys-swapfile` will be necessary. It will create a 2GB swap file per default, which is sufficient. In situations where more memory is available, installation of `dphys-swapfile` can be skipped altogether.
 

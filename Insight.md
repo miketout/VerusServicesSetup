@@ -186,7 +186,7 @@ Within the `insight` account scope, globally install `pm2 v4.2.1` and `bitcore-n
 npm -g install pm2@4.2.1 git+https://github.com/BloodyNora/bitcore-node-komodo.git
 ```
 
-Since we opted to use the newest possible NodeJS version, we'll need to go a slightly different route than shown in other guides. Prepare a directory structure for Insight.
+Since we opted to use the newest NodeJS version the v0.4.3 insight API supports, we'll need to go a slightly different route than shown in other guides. Prepare a directory structure for Insight.
 
 ```bash
 cd ~
@@ -262,6 +262,25 @@ Now launch Insight using `pm2` and follow the log output to make sure Insight la
 cd ~/insight.VRSC
 pm2 start --name insight.VRSC "npm start"; pm2 log insight.VRSC
 ```
+
+A successful launch looks like this:
+
+```bash
+0|insight.VRSC  | [2020-12-29T14:59:28.178Z] info: Using config: /home/insight/insight.VRSC/bitcore-node.json
+0|insight.VRSC  | [2020-12-29T14:59:28.180Z] info: Using network: livenet
+0|insight.VRSC  | [2020-12-29T14:59:28.181Z] info: Starting bitcoind
+0|insight.VRSC  | [2020-12-29T14:59:28.247Z] info: Komodo Daemon Ready
+0|insight.VRSC  | [2020-12-29T14:59:28.248Z] info: Starting web
+0|insight.VRSC  | [2020-12-29T14:59:28.255Z] info: Starting insight-api-komodo
+0|insight.VRSC  | [2020-12-29T14:59:28.256Z] info: Starting insight-ui-komodo
+0|insight.VRSC  | [2020-12-29T14:59:28.256Z] info: Bitcore Node ready
+0|insight.VRSC  | [2020-12-29T14:59:28.738Z] warn: ZMQ connection delay: tcp://127.0.0.1:27487
+0|insight.VRSC  | [2020-12-29T14:59:28.738Z] info: ZMQ connected to: tcp://127.0.0.1:27487
+0|insight.VRSC  | [2020-12-29T15:00:08.416Z] info: Komodo Height: 1329705 Percentage: 100.00
+0|insight.VRSC  | [2020-12-29T15:01:31.224Z] info: Komodo Height: 1329706 Percentage: 100.00
+```
+
+Insight is now listening at http://127.0.0.1:3002. As mentioned in the beginning of this document, this is not a production ready setup but a proof of concept guide. In order to be able to reach the finished installation from the outside, you need to setup a webserver to proxy back and forth between the internet and the Insight deployment. For proper operation, the webserver does need to support `websocket` proxying.
 
 ### Enable `logrotate`
 

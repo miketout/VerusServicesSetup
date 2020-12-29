@@ -316,3 +316,4 @@ Switch to the `insight` user. Edit the `crontab` using `crontab -e` and add this
 PATH=".:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/insight/bin:/home/insight/.nvm/versions/node/v9.11.2/bin"
 @reboot cd /home/insight/insight.VRSC && pm2 start --name insight.VRSC "npm start" 1>/dev/null 2>&1
 ```
+**NOTE:** with every NodeJS update, the last part of the `PATH` variable from the `insight` crontab may change since it has a version number in it.

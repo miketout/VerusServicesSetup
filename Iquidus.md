@@ -244,3 +244,5 @@ Switch to the `iquidus` user. Edit the `crontab` using `crontab -e` and add this
 PATH=".:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/iquidus/bin:/home/iquidus/.nvm/versions/node/v12.20.0/bin"
 @reboot cd /home/iquidus/explorer && pm2 start --name explorer "npm start" 1>/dev/null 2>&1
 ```
+
+**NOTE:** with every NodeJS update, the last part of the `PATH` variable from the `iquidus` crontab may change since it has a version number in it.

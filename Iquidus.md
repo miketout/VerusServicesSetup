@@ -15,6 +15,9 @@ apt update
 apt upgrade
 apt install wget libgomp1 git python build-essential
 ```
+
+Additionally, Iquidus requires a MongoDB backend. Please refer to [this](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/) document for MongoDB install instructions.
+
 With the minimum memory requirement above, `dphys-swapfile` will be necessary. It will create a 2GB swap file per default, which is sufficient. In situations where more memory is available, installation of `dphys-swapfile` can be skipped altogether.
 
 ```bash

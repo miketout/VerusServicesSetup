@@ -210,7 +210,7 @@ To setup Iquidus the way you like it, copy `settings.json.template` to `settings
 
 ```bash
 cd ~/explorer
-pm2 --name "explorer" "npm start"; pm2 log all
+pm2 start --name "explorer" "npm start"; pm2 log all
 ```
 
 ### Enable `logrotate`

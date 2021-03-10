@@ -1,232 +1,226 @@
-# Iquidus Explorer for VerusCoin
+# Iquidus Explorer for Verus
+
+**NOTE:** For all downloads mentioned below you are encouraged use the [Verus Signature verification tool](https://verus.io/verify-signatures) or a local standalone Verus daemon to make sure the files are authentic and have not been tampered with. Additionally, the setup described below is in no way production ready but is meant to illustrate the general process only. **System hardening, firewalling, signature verification and other measures are outside of the scope of this guide. You will have to take care of it for yourself!**
 
 ## Server
 
-A VPS with 4GB of RAM, anything above 20GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
-
+A VPS with 4GB of RAM, anything from 30GB SSD storage and 2 CPU cores is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 ## Operating System
 
-This guide is tailored to and tested on `Debian 9 "Stretch"`. Before starting, please install the latest updates:
+This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites. 
 
-```
+```bash
 apt update
-apt -y upgrade
+apt upgrade
+apt install wget libgomp1 git python build-essential
 ```
 
-## Wallet
+Additionally, Iquidus requires a MongoDB backend. Please refer to [this](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/) document for MongoDB install instructions.
 
-The packages required in order to compile a VerusCoin wallet can be installed like this:
+With the minimum memory requirement above, `dphys-swapfile` will be necessary. It will create a 2GB swap file per default, which is sufficient. In situations where more memory is available, installation of `dphys-swapfile` can be skipped altogether.
 
-```
-apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib autoconf \
-                   libtool ncurses-dev unzip git python python-zmq zlib1g-dev wget \
-                   libcurl4-openssl-dev bsdmainutils automake curl
+```bash
+apt install dphys-swapfile
 ```
 
+## Verus Node
 
-Create a useraccount for the wallet. Switch to that account.
+Create a user account for the Verus node and switch to it. 
 
-```
-useradd -m -d /home/veruscoin -s /bin/bash veruscoin
-su - veruscoin
-```
-
-Now, clone the source tree and build the binaries:
-
-```
-git clone https://github.com/VerusCoin/VerusCoin
-cd VerusCoin
-./zcutil/fetch-params.sh
-./zcutil/build.sh -j$(nproc)
+```bash
+useradd -m -d /home/verus -s /bin/bash verus
+su - verus
 ```
 
-After that is done, create a `~/bin` directory and copy over the binaries. Strip the debug symbols.
+Prepare the `~/bin` directory and add it to the users' `PATH`.
 
-```
+```bash
 mkdir ~/bin
-cp src/verusd src/verus ~/bin
-strip ~/bin/verus*
+echo export PATH=\"${PATH}:/home/verus/bin\" >> ~/.bashrc
 ```
 
-Now, lets create the data directory. Then, get the bootstrap and unpack it there.
+Log out and back into the account to get the new `PATH` into the environment.
 
-```
-mkdir -p ~/.komodo/VRSC
-cd ~/.komodo/VRSC
-wget https://bootstrap.0x03.services/veruscoin/VRSC-bootstrap.tar.gz
-tar zxf VRSC-bootstrap.tar.gz
-rm VRSC-bootstrap.tar.gz
+```bash
+exit
+su - verus
 ```
 
-Create `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
-A resonably secure `rpcpassword` can be generated using this command:
-`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`.
+Download the **latest** (`v0.7.2-6` used in this example) Verus binaries from the [GitHub Releases Page](https://github.com/VerusCoin/VerusCoin/releases). Unpack, move them into place and clean up like so: 
 
+```bash
+wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.7.2-6/Verus-CLI-Linux-v0.7.2-6-amd64.tgz
+tar xf Verus-CLI-Linux-v0.7.2-6-amd64.tgz; tar xf Verus-CLI-Linux-v0.7.2-6-amd64.tar.gz
+mv verus-cli/{fetch-params,fetch-bootstrap,verusd,verus} ~/bin
+rm -rf verus-cli Verus-CLI-Linux-v0.7.2-6-amd64.t*
 ```
-server=1
-listen=1
-listenonion=0
-maxconnections=256
 
-# wallet is not needed
+Use the supplied script to download a copy of the `zcparams` data. Watch for and fix any occuring errors until you can be sure you successfully have gotten a complete `zcparams` copy.
+
+```bash
+fetch-params
+# ... a lot of output from wget and sadly no clear conclusion notice
+```
+
+Use the supplied script to download and unpack the latest bootstrap into the default data directory. Watch for and fix any occuring errors until you can be sure you successfully got, checksum-verified and unpacked the latest bootstrap into the default Verus data directory location.
+
+```bash
+fetch-bootstrap
+# ... some output
+Enter blockchain data directory or leave blank for default:<return>
+Install bootstrap in /home/verus/.komodo/VRSC? ([1]Yes/[2]No)<1><return>
+# ... some more output, then, ideally
+Bootstrap successfully installed
+```
+
+Create (and where necessary, adapt) a `VRSC.conf` file.
+
+```bash
+cat << EOF > ~/.komodo/VRSC/VRSC.conf
+##
+## verus iquidus node config
+##
+
+# explorer doesn't need a wallet
 disablewallet=1
 
-# logging related options
-logtimestamps=1
-logips=1
-shrinkdebugfile=0
+# network options
+listen=1
+port=27485
+maxconnections=1024
 
-# how many blocks to check on startup
-checkblocks=64
-
-# indexing options
-txindex=1
-addressindex=1
-timestampindex=1
-spentindex=1
-
-# make sure ipv4 & ipv6 is used
-bind=0.0.0.0
-bind=::
-
-# rpc settings
-rpcuser=veruscoin
-rpcpassword=your-secret-veruscoin-rpc-password
+# rpc options
+server=1
+rpcuser=verus
+rpcpassword=OBVIOUSLY-EDIT-HERE
 rpcport=27486
-rpcthreads=256
-rpcworkqueue=1024
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
+rpcthreads=64
+rpcworkqueue=256
 
-# if a peer jacks up more than 25 times in a row, ban it
-banscore=25
+# logging options
+logtimestamps=1
+logips=1
 
-# make sure gen is off
-gen=0
+# debug options
+shrinkdebugfile=0
+debug=0
+
+# checks
+checklevel=4
+checkblocks=1440
 
 # addnodes
-seednode=185.25.48.236:27485
-addnode=185.25.48.236:27487
-seednode=185.64.105.111:27485
-addnode=185.64.105.111:27487
-seednode=185.25.48.72:27485
-seednode=185.25.48.72:27487
+addnode=136.243.227.142:27485
+addnode=5.9.224.250:27485   
+addnode=95.216.104.210:27485
+addnode=135.181.68.2:27485
+addnode=185.25.48.236:27485 
+addnode=185.64.105.111:27485
+
+# EOF
+EOF
 ```
 
-For proper Iquidus operation, `txindex=1` is crucial. Afterwards, start the daemon and let it sync the small rest of the blockchain:
+A reasonably secure `rpcpassword` for the above config can be generated with the commands below.
 
-```
-verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon
-```
-
-To check the status and know when the initial sync has been completed, issue
-
-```
-verus getinfo
+```bash
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
 ```
 
-When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. While we wait for this to happen, lets continue.
+Start `verusd` and follow the `debug.log` output to make sure `verusd` syncs to current height and otherwise comes up successfully.
 
-## NodeJS 10 & Prerequisites
+```bash
+cd ~/.komodo/VRSC && verusd -daemon 1>/dev/null 2>&1
+tail -f debug.log
+```
 
-Install NodeJS v10 like this:
+Now exit the `verus` account.
+
+```bash
+exit
+```
+
+## NodeJS
+
+Create a user account to run `iquidus` from and switch to it. Within this user account `nvm.sh` and ultimately `NodeJS` will be installed.
+
+```bash
+useradd -m -d /home/iquidus -s /bin/bash iquidus
+su - iquidus
+```
+
+Prepare the `~/bin` directory and add it to the users' `PATH`.
+
+```bash
+mkdir ~/bin
+echo export PATH=\"${PATH}:/home/iquidus/bin\" >> ~/.bashrc
+```
+
+Install NodeJS v9 using `nvm.sh` like this: 
+
+```bash
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+```
+
+To activate the changes, log out of and back into the `iquidus` account.
+
+```bash
+exit
+su - iquidus
+```
+
+Install and activate NodeJS v12.
 
 ```
-curl -sL https://deb.nodesource.com/setup_10.x | bash -
-apt update; apt -y upgrade
-apt -y install nodejs
+nvm install 12
+nvm use 12
+```
+
+Within the `iquidus` account scope, globally install `pm2` as shown below.
+
+```bash
 npm -g install pm2
 ```
-Alternatively, if you'd like to keep all the NodeJS-related data within a user account, you can use [nvm.sh](https://nvm.sh) to install NodeJS into the `veruscoin-explorer` account. See their notes for more info.
 
 ## Iquidus Installation
 
-Create a new user account for the explorer and switch to it.
+While still logged in as the `iquidus` user, clone the Iquidus repository.
 
-```
-useradd -m -d /home/veruscoin-explorer -s /bin/bash veruscoin-explorer
-su - veruscoin-explorer
-```
-
-Now, check out the Veruscoin Iquidus repo and install it:
-
-```
-git clone https://github.com/VerusCoin/explorer
-cd explorer
-npm install
-cp settings.json.template settings.json
+```bash
+cd ~/
+git clone https://github.com/BloodyNora/explorer
 ```
 
-## Iquidus Configuration
+See https://github.com/BloodyNora/explorer for the basic of install instructions of Iquidus. Read this document thoroughly, it contains information about the MongoDB backend, necessary steps for initial data import (also see right below) and keeping the explorer in sync with the Verus chain. 
 
-See https://github.com/iquidus/explorer for the list of install instructions of Iquidus. The Genesis block/tx values are:
+**NOTE:** Before starting an init sync, in the resulting installed `node_modules`, we need to disable `json-bigint strict mode` in 3 places: 
 
-```
-//genesis
-"genesis_block": "027e3758c3a65b12aa1046462b486d0a63bfa1beae327897f56c5cfb7daaae71",
-"genesis_tx": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-```
-
-You may want to disable the `twitter` and `markets` display. You should only bind Iquidus to loopback and proxy this to the world with nginx.
-
-
-Make sure the VerusCoin wallet is running. You should now be able to start Iquidus.
-
-```
-cd /home/veruscoin-explorer/explorer; pm2 start --name explorer bin/instance
+```bash
+node_modules/bitcoin-node-api/node_modules/bitcoin-core/coverage/src/parser.js.html:251
+node_modules/bitcoin-node-api/node_modules/bitcoin-core/dist/src/parser.js:27
+node_modules/bitcoin-core/dist/src/parser.js:27
 ```
 
-Display the logs with this command:
+Each place has a representation of `strict: true` which needs to be changed to `strict: false` within the respective syntax limits.
 
-```
-pm2 log explorer
-```
+To setup Iquidus the way you like it, copy `settings.json.template` to `settings.json` and adapt where necessary. Launch the explorer using `pm2` and follow the log output to make sure Iquidus starts up allright. Ideally, Iquidus is now listening on the IP and Port you have configured.
 
-Initial sync will take up to 3 hours to complete. Start it like this:
-
-```
-cd /home/veruscoin-explorer/explorer && node scripts/sync.js index reindex
-```
-
-## Further considerations
-
-None of the topics below is strictly necessary, but most of them are recommended.
-
-### Improving SSH security
-
-If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't go google the comic, you might have missed a laugh there!
-
-As `root`, generate a proper `/etc/ssh/moduli` like this:
-
-```
-ssh-keygen -G "/root/moduli.candidates" -b 4096
-mv /etc/ssh/moduli /etc/ssh/moduli.old
-ssh-keygen -T /etc/ssh/moduli -f "/root/module.candidates"
-rm "/root/moduli.candidates"
-```
-
-Add the recommended changes from [CiperLi.st](https://cipherli.st) to `/etc/ssh/sshd_config`, also make sure that `PermitRootLogin` is at least set to `without-password`. Then remove and re-generate your host keys like this:
-
-```
-cd /etc/ssh
-rm ssh_host_*key*
-ssh-keygen -t ed25519 -f ssh_host_ed25519_key < /dev/null
-ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key < /dev/null
-```
-
-To finish, restart the ssh server:
-
-```
-/etc/init.d/sshd restart
+```bash
+cd ~/explorer
+pm2 start --name "explorer" "npm start"; pm2 log all
 ```
 
 ### Enable `logrotate`
 
-As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these contents:
+As `root` user, create a file called `/etc/logrotate.d/verus-iquidus` with these contents:
 
 ```
-/home/veruscoin/.komodo/VRSC/debug.log
+/home/verus/.komodo/VRSC/debug.log
+/home/iquidus/.pm2/logs/explorer.VRSC-out.log
+/home/iquidus/.pm2/logs/explorer.VRSC-error.log
 {
   rotate 14
   daily
@@ -240,88 +234,18 @@ As `root` user, create a file called `/etc/logrotate.d/veruscoin` with these con
 
 ### Autostart using `cron`
 
-Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
+Switch to the `verus` user. Edit the `crontab` using `crontab -e` and add this to the appropriate place:
 
-```
-@reboot /home/veruscoin/bin/verusd -addnode=185.25.48.236 -addnode=185.64.105.111 -daemon 1>/dev/null 2>&1
-```
-
-### Increase open files limit
-
-Add this to your `/etc/security/limits.conf`:
-
-```
-* soft nofile 1048576
-* hard nofile 1048576
+```crontab
+PATH=".:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/verus/bin"
+@reboot cd /home/verus/.komodo/VRSC && /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
 ```
 
-Reboot to activate the changes. Alternatively you can make sure all running processes are restarted from within a shell that has been launched _after_ the above changes were put in place.
+Switch to the `iquidus` user. Edit the `crontab` using `crontab -e` and add this to the appropriate place:
 
-
-### Networking optimizations
-
-If your pool is expected to receive a lot of load, consider implementing below changes, all as `root`:
-
-Enable the `tcp_bbr` kernel module:
-
-```
-modprobe tcp_bbr
-echo tcp_bbr >> /etc/modules
+```crontab
+PATH=".:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/iquidus/bin:/home/iquidus/.nvm/versions/node/v12.20.0/bin"
+@reboot cd /home/iquidus/explorer && pm2 start --name explorer "npm start" 1>/dev/null 2>&1
 ```
 
-Edit your `/etc/sysctl.conf` to include below settings:
-
-```
-net.ipv4.tcp_congestion_control=bbr
-net.core.rmem_default = 1048576
-net.core.wmem_default = 1048576
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
-net.ipv4.tcp_rmem = 4096 87380 16777216
-net.ipv4.tcp_wmem = 4096 65536 16777216
-net.ipv4.udp_rmem_min = 16384
-net.ipv4.udp_wmem_min = 16384
-net.core.netdev_max_backlog = 262144
-net.ipv4.tcp_max_orphans = 262144
-net.ipv4.tcp_max_syn_backlog = 262144
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_max_tw_buckets = 2000000
-net.ipv4.ip_local_port_range = 16001 65530
-net.core.somaxconn = 20480
-net.ipv4.tcp_low_latency = 1
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_fastopen = 3
-net.ipv4.tcp_limit_output_bytes = 131072
-```
-
-Run below command to activate the changes, alternatively reboot the machine:
-
-
-```
-sysctl -p /etc/sysctl.conf
-```
-
-### Change swapping behaviour
-
-If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting:
-
-```
-vm.swappiness=1
-```
-
-The range is `1-100`. The *lower* the number, the *later* the system will start swapping stuff out. Run below command to activate the change, alternatively reboot the machine:
-
-```
-sysctl -p /etc/sysctl.conf
-```
-
-### Install `molly-guard`
-
-As a last sanity check before reboots, `molly-guard` will prompt you for the hostname of the system you're about to reboot. Install it like this:
-
-```
-apt -y install molly-guard
-```
-
-Check `/etc/molly-guard/rc` for more options.
+**NOTE:** with every NodeJS update, the last part of the `PATH` variable from the `iquidus` crontab may change since it has a version number in it.

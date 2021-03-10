@@ -16,7 +16,7 @@ Basically, anything in there that is not a real CPU name _may_ cause NodeJS to b
 
 ## Operating System
 
-This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Ubuntu` or `Devuan` and others. Before starting, please install the latest updates and prerequisites.
+This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
 
 ```bash
 apt update

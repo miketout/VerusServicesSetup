@@ -183,7 +183,7 @@ nvm use 9
 Within the `insight` account scope, globally install `pm2 v4.2.1` and `bitcore-node` as shown below.
 
 ```bash
-npm -g install pm2@4.2.1 git+https://github.com/BloodyNora/bitcore-node-komodo.git
+npm -g install pm2@4.2.1 git+https://github.com/VerusCoin/bitcore-node-komodo.git
 ```
 
 Since we opted to use the newest NodeJS version the v0.4.3 insight API supports, we'll need to go a slightly different route than shown in other guides. Prepare a directory structure for Insight.
@@ -202,14 +202,14 @@ cat << EOF > ~/insight.VRSC/package.json
     "start": "bitcore-node start"
   },
   "description": "Verus Bitcore Node",
-  "repository": "https://github.com/BloodyNora/bitcore-node-komodo",
+  "repository": "https://github.com/VerusCoin/bitcore-node-komodo",
   "license": "MIT",
   "readme": "README.md",
   "dependencies": {
-    "bitcore-lib-komodo":  "git+https://github.com/BloodyNora/bitcore-lib-komodo.git",
-    "bitcore-node-komodo": "git+https://github.com/BloodyNora/bitcore-node-komodo.git",
-    "insight-api-komodo":  "git+https://github.com/BloodyNora/insight-api-komodo.git",
-    "insight-ui-komodo":   "git+https://github.com/BloodyNora/insight-ui-komodo.git"
+    "bitcore-lib-komodo":  "git+https://github.com/VerusCoin/bitcore-lib-komodo.git",
+    "bitcore-node-komodo": "git+https://github.com/VerusCoin/bitcore-node-komodo.git",
+    "insight-api-komodo":  "git+https://github.com/VerusCoin/insight-api-komodo.git",
+    "insight-ui-komodo":   "git+https://github.com/VerusCoin/insight-ui-komodo.git"
   }
 }
 EOF
@@ -250,8 +250,8 @@ Enter the `node_modules` directory, clone the needed repositories and install th
 
 ```bash
 cd ~/insight.VRSC/node_modules
-git clone https://github.com/BloodyNora/insight-ui-komodo
-git clone https://github.com/BloodyNora/insight-api-komodo
+git clone https://github.com/VerusCoin/insight-ui-komodo
+git clone https://github.com/VerusCoin/insight-api-komodo
 cd insight-api-komodo
 npm install --production
 ```

@@ -251,8 +251,9 @@ Enter the `node_modules` directory, clone the needed repositories and install th
 ```bash
 cd ~/insight.VRSC/node_modules
 git clone https://github.com/VerusCoin/insight-ui-komodo
-git clone https://github.com/VerusCoin/insight-api-komodo
-cd insight-api-komodo
+mkdir api
+git clone https://github.com/VerusCoin/insight-api-komodo ./api
+cd api
 npm install --production
 ```
 

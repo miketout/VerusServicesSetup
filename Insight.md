@@ -225,7 +225,7 @@ cat << EOF > ~/insight.VRSC/bitcore-node.json
   "port": 3002,
   "services": [
     "bitcoind",
-    "insight-api-komodo",
+    "api",
     "insight-ui-komodo",
     "web"
   ],

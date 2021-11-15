@@ -188,7 +188,7 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 @reboot cd /home/verus/.komodo/VRSC; /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
 ```
 
-**HINT** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
+**HINT:** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
 
 ## Redis
 

@@ -287,16 +287,18 @@ npm install
 
 ## Configuration Instructions
 
-Shielding is no longer required for mined VerusCoins. We will need one public address for this. Switch to the `veruscoin` user and generate the addresses:
+Shielding is no longer required for mined Verus coins. We will need two public addresses for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```bash
+verus getnewaddress
 verus getnewaddress
 ```
 
 Next, we will dump the private keys of these addresses for safety reasons. For the transparent addresses, use
 
 ```bash
-verus dumpprivkey <Verus T-Address>
+verus dumpprivkey <Verus T-Address 1>
+verus dumpprivkey <Verus T-address 2>
 ```
 
 **Save the data in an offline location, not on your computer!**
@@ -309,7 +311,8 @@ Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.jso
 
  * Set `enabled` to `true`.
  * Set `coin` to `vrsc.json`.
- * Set `address` to one of the public addresses generated before.
+ * Set `address` to the first public address generated before.
+ * Set `tAddress` to the second public address generated before.
  * Set `rewardRecipients` to your fee address and fee percentage. Remove `"": 0.2` if you want 0% fee.
  * Set `paymentInterval` to `180`
  * Set `minimumPayment` to `2`.

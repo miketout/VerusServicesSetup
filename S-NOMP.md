@@ -2,9 +2,9 @@
 
 Operating a mining pool requires you to know about systems administration, IT security, databases, software development, coin daemons and other more or less related stuff. Running a production pool can literally be more work than a full-time job.
 
-**NOTE** When you are done please message `0x03#8822 (ID: 335362302859542531)` (Black-background bald head beardy white avatar, white nick on the [Verus discord](https://discord.gg/VRKMP2S)) with your poolwallet IP so he can `addnode` it around his platform, which contributes to network stability. `Done` in this case means at least full setup procedure completed, pool running, a block was found and paid out. Thank you.
+**NOTE:** When you are done please message `englal#8861` on the [Verus discord](https://discord.gg/VRKMP2S)) with your poolwallet IP so he can `addnode` it around his platform, which contributes to network stability. `Done` in this case means at least full setup procedure completed, pool running, a block was found and paid out. Thank you.
 
-A VPS with 4GB of RAM, anything above 20GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from it's host. See below for an example that will likely lead to trouble.
+A VPS with 4GB of RAM, anything above 20GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from its host. See below for an example that will likely lead to trouble.
 
 ```bash
 lscpu|grep -i "model name"
@@ -16,7 +16,7 @@ Basically, anything in there that is not a real CPU name _may_ cause NodeJS to b
 
 ## Operating System
 
-This guide tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
+This guide is tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
 
 ```bash
 apt update
@@ -60,13 +60,13 @@ Install bootstrap in /home/verus/.komodo/VRSC? ([1]Yes/[2]No)<1><return>
 Bootstrap successfully installed
 ```
 
-Now, lets create the wallet export directory. Then, get the bootstrap and unpack it there.
+Now, let's create the data and wallet export directory. Then, get the bootstrap and unpack it there.
 
 ```bash
 mkdir ~/export
 ```
 
-It's time to do the wallet config. A resonably secure `rpcpassword` can be generated using this command:   
+It's time to do the wallet config. A reasonably secure `rpcpassword` can be generated using this command:   
 
 ```bash
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
@@ -163,19 +163,19 @@ Afterwards, start the verus daemon and let it sync the rest of the blockchain. W
 cd ~/.komodo/VRSC; verusd -daemon 1>/dev/null 2>&1; sleep 1; tail -f debug.log
 ```
 
-Press `ctrl-c` to exit `tail` if it looks allright. To check the status and know when the initial sync has been completed, issue
+Press `ctrl-c` to exit `tail` if it looks alright. To check the status and know when the initial sync has been completed, issue
 
 ```bash
 verus getinfo
 ```
 
-When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are in fact not on a fork. Edit the `crontab` using `crontab -e` and include the line below to autostart the poolwallet:
+When it has synced up to height, the `blocks` and `longestchain` values will be at par. Additionally, you should verify against [the explorer](https://explorer.veruscoin.io) that you are not on a fork. Edit the `crontab` using `crontab -e` and include the line below to autostart the poolwallet:
 
 ```crontab
 @reboot cd /home/verus/.komodo/VRSC; /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
 ```
 
-**HINT** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
+**HINT:** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
 
 ## Redis
 
@@ -246,14 +246,14 @@ su - pool
 ```
 
 Now, install `NodeJS v8` via `nvm.sh` as well as `redis-commander` and [PM2](http://pm2.keymetrics.io) via `npm`.   
-**NOTE** Node v10 won't work. You _will_ have to use Node v8!
+**NOTE:** Node v10 won't work. You _will_ have to use Node v8!
 
 ```bash
 nvm install 8
 npm install -g redis-commander pm2
 ```
 
-Because `nvm.sh` comes without it, we need to add one symlink into it's bindir for our installed NodeJS.
+Because `nvm.sh` comes without it, we need to add one symlink into its bindir for our installed NodeJS.
 
 ```bash
 which node
@@ -270,7 +270,7 @@ exit
 
 ## S-NOMP
 
-Nake sure you're in the `pool` account and clone the S-NOMP from our main repository:
+Make sure you're in the `pool` account and clone the S-NOMP from our main repository:
 
 ```bash
 su - pool
@@ -336,7 +336,7 @@ Now switch to the `verus` user, stop the wallet once more.
 verus stop
 ```
 
-To determine the location of you `node` binary, switch to user `pool`, do this and record your result. We'll need it for the next step.
+To determine the location of your `node` binary, switch to user `pool`, do this and record your result. We'll need it for the next step.
 
 ```bash
 which node
@@ -371,7 +371,7 @@ Edit your crontab using `crontab -e` and shove in this line at the bottom:
 @reboot /bin/sleep 300 && cd /home/pool/s-nomp && /usr/bin/pm2 start init.js --name veruspool
 ```
 
-**HINT** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
+**HINT:** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
 
 
 ## Further considerations
@@ -421,7 +421,7 @@ Thank you.
 
 ### Improving SSH security
 
-If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't go google the comic, you might have missed a laugh there!
+If you remember the good old `rand=4; // chosen by fair dice roll` comic, you're probably doing this anyways. If you don't, go Google the comic, you might have missed a laugh there!
 
 As `root`, generate a proper `/etc/ssh/moduli` like this:
 

@@ -33,50 +33,37 @@ useradd -m -d /home/verus -s /bin/bash verus
 su - verus
 ```
 
-Download the [official Verus binaries](https://github.com/VerusCoin/VerusCoin/releases) for the **current release** and unpack them (v0.6.2-1used in this example):
+DDownload the **latest** (`v0.7.2-6` used in this example) Verus binaries from the [GitHub Releases Page](https://github.com/VerusCoin/VerusCoin/releases). Unpack, move them into place and clean up like so:
 
 ```bash
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz https://github.com/VerusCoin/VerusCoin/releases/download/v0.6.2-1/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt
-# if this next command doesn't return `true`, please re-download and/or report to discord. thank you.
-# note, currently the txt file isn't valid json, you'll need to add a `,` at the end of the `signer` line.
-verus verifyfile "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signer)" "$(cat Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz.txt | jq -r .signature)" $(pwd)/Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz
-tar xf Verus-CLI-Linux-v0.6.2-1-amd64.tar.gz
+wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.7.2-8/Verus-CLI-Linux-v0.7.2-8-amd64.tgz
+tar xf Verus-CLI-Linux-v0.7.2-8-amd64.tgz; tar xf Verus-CLI-Linux-v0.7.2-8-amd64.tar.gz
+mv verus-cli/{fetch-params,fetch-bootstrap,verusd,verus} ~/bin
+rm -rf verus-cli Verus-CLI-Linux-v0.7.2-8-amd64.t*
 ```
 
-Create a `~/bin` directory, move over all executable files.
-
-```bash
-mkdir ~/bin
-mv verus-cli/verus* verus-cli/fetch-params ~/bin
-echo export PATH=\"${PATH}:/home/verus/bin\" >> ~/.bashrc
-```
-
-Log out of the `verus` account and back into it to get `~/bin` into the `PATH`:
-
-```bash
-exit
-su - verus
-```
-
-Now, get the `zcparams` data:
+Use the supplied script to download a copy of the `zcparams` data. Watch for and fix any occuring errors until you can be sure you successfully have gotten a complete `zcparams` copy.
 
 ```bash
 fetch-params
+# ... a lot of output from wget and sadly no clear conclusion notice
+```
+
+Use the supplied script to download and unpack the latest bootstrap into the default data directory. Watch for and fix any occuring errors until you can be sure you successfully got, checksum-verified and unpacked the latest bootstrap into the default Verus data directory location.
+
+```bash
+fetch-bootstrap
+# ... some output
+Enter blockchain data directory or leave blank for default:<return>
+Install bootstrap in /home/verus/.komodo/VRSC? ([1]Yes/[2]No)<1><return>
+# ... some more output, then, ideally
+Bootstrap successfully installed
 ```
 
 Now, let's create the data and wallet export directory. Then, get the bootstrap and unpack it there.
 
 ```bash
 mkdir ~/export
-mkdir -p ~/.komodo/VRSC
-cd ~/.komodo/VRSC
-wget --continue --retry-connrefused --waitretry=3 --timeout=15 https://bootstrap.veruscoin.io/VRSC-bootstrap.tar.gz https://bootstrap.veruscoin.io/VRSC-bootstrap.tar.gz.sha256sum
-
-# if that doesn't work out OK please redownload or abort and report to discord!
-sha256sum -c VRSC-bootstrap.tar.gz.sha256sum
-
-tar xf VRSC-bootstrap.tar.gz
-rm VRSC-bootstrap.tar.gz
 ```
 
 It's time to do the wallet config. A reasonably secure `rpcpassword` can be generated using this command:   
@@ -300,16 +287,18 @@ npm install
 
 ## Configuration Instructions
 
-Shielding is no longer required for mined VerusCoins. We will need one public address for this. Switch to the `veruscoin` user and generate the addresses:
+Shielding is no longer required for mined Verus coins. We will need two public addresses for this. Switch to the `veruscoin` user and generate the addresses:
 
 ```bash
+verus getnewaddress
 verus getnewaddress
 ```
 
 Next, we will dump the private keys of these addresses for safety reasons. For the transparent addresses, use
 
 ```bash
-verus dumpprivkey <Verus T-Address>
+verus dumpprivkey <Verus T-Address 1>
+verus dumpprivkey <Verus T-address 2>
 ```
 
 **Save the data in an offline location, not on your computer!**
@@ -322,7 +311,8 @@ Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.jso
 
  * Set `enabled` to `true`.
  * Set `coin` to `vrsc.json`.
- * Set `address` to one of the public addresses generated before.
+ * Set `address` to the first public address generated before.
+ * Set `tAddress` to the second public address generated before.
  * Set `rewardRecipients` to your fee address and fee percentage. Remove `"": 0.2` if you want 0% fee.
  * Set `paymentInterval` to `180`
  * Set `minimumPayment` to `2`.

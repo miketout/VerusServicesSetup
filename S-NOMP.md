@@ -182,6 +182,8 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 Switch back to the `root` account by typing `exit` or hitting `ctrl-d`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
 
 ```conf
+unixsocket /var/run/redis/redis.sock
+unixsocketperm 775
 bind 127.0.0.1
 appendonly yes
 ```
@@ -234,6 +236,8 @@ Create a new user account to run the pool from. Switch to that user to setup `nv
 
 ```bash
 useradd -m -d /home/pool -s /bin/bash pool
+usermod -g pool redis
+chown -R redis:pool /var/run/redis
 su - pool
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
 ```
@@ -306,6 +310,7 @@ verus dumpprivkey <Verus T-address 2>
 Now, switch to the `pool` account. First, copy `/home/pool/s-nomp/config_example.json` to `/home/pool/s-nomp/config.json`. Edit it to reflect the changes listed below.
 
   * Set both `host` and `stratumHost` to the external IP or DNS name of your server.
+  * Enable UNIX socket connections by setting `"socket": "/var/run/redis/redis.sock",`, `"password": ""` and removing the rest of the lines in the `"redis"` section
 
 Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.json` to `/home/pool/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below.
 

@@ -139,20 +139,32 @@ spendzeroconfchange=0
 #blocknotify=
 
 # seednodes
-# all seeds, bacloud servers
-seednode=seeds.veruscoin.io:27485
-seednode=185.25.48.236:27487
-seednode=185.64.105.111:27487
-seednode=185.25.48.72:27487
+seednode=157.90.113.198:27485
+seednode=157.90.155.113:27485
+seednode=95.217.1.76:27485
+seednode=45.79.111.201:27485
+seednode=45.79.237.198:27485
+seednode=172.104.48.148:27485
+seednode=66.228.59.168:27485
+# old seednode
+seednode=95.216.104.210:27485
 
-# addnodes
-# vrsc0..2
+## addnodes
+# vrsc0..1
 addnode=185.25.48.236:27485
-addnode=185.25.48.236:27487
 addnode=185.64.105.111:27485
-addnode=185.64.105.111:27487
-addnode=185.25.48.72:27485
-addnode=185.25.48.72:27487
+# ex0..2
+addnode=157.90.127.142:27485
+addnode=157.90.248.145:27485
+addnode=135.181.253.217:27485
+# iq0..2
+addnode=95.216.104.214:27485
+addnode=135.181.68.6:27485
+addnode=168.119.27.246:27485
+# lw0..2
+addnode=168.119.166.240:27485
+addnode=157.90.155.8:27485
+addnode=65.21.63.161:27485
 
 # EOF
 ```

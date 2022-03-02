@@ -266,7 +266,7 @@ Now, install `NodeJS v8` via `nvm.sh` as well as `redis-commander` and [PM2](htt
 
 ```bash
 nvm install 8
-npm install -g redis-commander pm2
+npm install -g redis-commander pm2@4.5.6
 ```
 
 Because `nvm.sh` comes without it, we need to add one symlink into its bindir for our installed NodeJS.

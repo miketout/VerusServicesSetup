@@ -209,6 +209,7 @@ And use the following command to activate it immediately
 ```bash
 sysctl net.core.somaxconn=1024
 ```
+**NOTE:** Be aware that you may have to install the POSIX module (as pool user in the `~/s-nomp` directory: `npm install posix`)
 
 
 Set the overcommit_memory feature to 1, to avoid loss of data in case of not enough memory:
@@ -262,7 +263,8 @@ su - pool
 ```
 
 Now, install `NodeJS v8` via `nvm.sh` as well as `redis-commander` and [PM2](http://pm2.keymetrics.io) via `npm`.   
-**NOTE:** Node v10 won't work. You _will_ have to use Node v8!
+**NOTE:** Node v10 or higher won't work. You _will_ have to use Node v8!
+**NOTE:** PM2 v5.0.0 or higher won't work. You _will_ have to use PM2 v4.5.6!
 
 ```bash
 nvm install 8

@@ -240,6 +240,19 @@ cat << EOF > ~/insight.VRSC/bitcore-node.json
           "zmqpubrawtx": "tcp://127.0.0.1:27487"
         }
       ]
+    },
+    "api":{
+      "disableRateLimiter": false,
+      "rateLimiterOptions": {
+        "whitelist": ["::ffff:127.0.0.1","127.0.0.1"],
+        "whitelistLimit": 500000,
+        "whitelistInterval": 3600000
+        "blacklist": [],
+        "blacklistLimit": 0,
+        "blacklistInterval": 3600000,
+        "limit": 10,
+        "interval": 60000
+      }
     }
   }
 }

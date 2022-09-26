@@ -8,4 +8,4 @@
   * [Insight](Insight.md)
   * [TOR-Wallet](TOR-Wallet.md)
   * [Tails-Wallet](Tails-Wallet.md)
-  * [Verus Staking Node](VerusNode.md) (thanks, Oink)
+  * [Verus Staking Node](VerusNode.md)

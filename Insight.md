@@ -246,7 +246,7 @@ cat << EOF > ~/insight.VRSC/bitcore-node.json
       "rateLimiterOptions": {
         "whitelist": ["::ffff:127.0.0.1","127.0.0.1"],
         "whitelistLimit": 500000,
-        "whitelistInterval": 3600000
+        "whitelistInterval": 3600000,
         "blacklist": [],
         "blacklistLimit": 0,
         "blacklistInterval": 3600000,

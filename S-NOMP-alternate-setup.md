@@ -1,10 +1,17 @@
-# S-NOMP for Verus
+# S-NOMP for Verus, alternate setup
+
+This alternate setup deviates from the standard setup on the following subjects:
+ - It installs and uses `keydb` as replacement for `redis`. `Keydb` is a faster and less memory intensive database, fully compatible with `redis`.
+ - It prepares the `keydb` database for use with additional stratum servers.
+ - It simplifies the Verus Daemon installation process by using an install script from https://github.com/Oink70/Verus-CLI-tools.
+ - Mentions `blocknotify.c` code to be compiled and used as alternative for the standard `api.js`.
+ - it includes `UFW firewall` instructions.
 
 Operating a mining pool requires you to know about systems administration, IT security, databases, software development, coin daemons and other more or less related stuff. Running a production pool can literally be more work than a full-time job.
 
 **NOTE:** When you are done please message `englal#8861` on the [Verus discord](https://discord.gg/VRKMP2S)) with your poolwallet IP so he can `addnode` it around his platform, which contributes to network stability. `Done` in this case means at least full setup procedure completed, pool running, a block was found and paid out. Thank you.
 
-A VPS with 4GB of RAM, anything above 20GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from its host. See below for an example that will likely lead to trouble.
+A VPS with 8GB of RAM, anything above 30GB **SSD** storage and 1 CPU core which knows about AES-NI is the absolute minimum requirement. Generally, having more RAM is more important than having more CPU power here. Additionally, the hypervisor of your VPS _must_ pass through the original CPU designation from its host. See below for an example that will likely lead to trouble.
 
 ```bash
 lscpu|grep -i "model name"
@@ -16,12 +23,14 @@ Basically, anything in there that is not a real CPU name _may_ cause NodeJS to b
 
 ## Operating System
 
-This guide is tailored to and tested on `Debian 10 "Buster"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
+This guide is tailored to and tested on `Debian 11 "Bullseye"` but should probably also work on Debian-ish derivatives like `Devuan` or `Ubuntu` and others. Before starting, please install the latest updates and prerequisites.
 
 ```bash
+echo "deb https://download.keydb.dev/open-source-dist $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/keydb.list
+wget -O /etc/apt/trusted.gpg.d/keydb.gpg https://download.keydb.dev/open-source-dist/keyring.gpg
 apt update
 apt -y upgrade
-apt -y install libgomp1 redis-server git libboost-all-dev libsodium-dev build-essential
+apt -y install libgomp1 keydb git libboost-all-dev libsodium-dev build-essential
 ```
 
 ## Poolwallet
@@ -33,34 +42,20 @@ useradd -m -d /home/verus -s /bin/bash verus
 su - verus
 ```
 
-DDownload the **latest** (`v0.7.2-6` used in this example) Verus binaries from the [GitHub Releases Page](https://github.com/VerusCoin/VerusCoin/releases). Unpack, move them into place and clean up like so:
+Download the **latest** (`v0.9.3` used in this example) Verus binaries from the [GitHub Releases Page](https://github.com/VerusCoin/VerusCoin/releases), unpack, move them into place and clean up like so:
 
 ```bash
-wget https://github.com/VerusCoin/VerusCoin/releases/download/v0.7.2-8/Verus-CLI-Linux-v0.7.2-8-amd64.tgz
-tar xf Verus-CLI-Linux-v0.7.2-8-amd64.tgz; tar xf Verus-CLI-Linux-v0.7.2-8-amd64.tar.gz
-mv verus-cli/{fetch-params,fetch-bootstrap,verusd,verus} ~/bin
-rm -rf verus-cli Verus-CLI-Linux-v0.7.2-8-amd64.t*
+mkdir ~/bin
+cd ~/bin
+wget https://raw.githubusercontent.com/Oink70/Verus-CLI-tools/main/auto-verus.sh
+chmod +x auto-verus.sh
+./auto-verus.sh
 ```
+When the script asks if this is a new installation, answer with `Y` (default). On `Enter blockchain data directory or leave blank for default:` press enter. On the question to install, answered with `1` (default).
+If you installed the updates and prerequisites, the daemon will start in the background.
+Check if it indeed started using `tail -f ~/.komodo/VRSC/debug.log` (`CTRL-C` to exit).
 
-Use the supplied script to download a copy of the `zcparams` data. Watch for and fix any occuring errors until you can be sure you successfully have gotten a complete `zcparams` copy.
-
-```bash
-fetch-params
-# ... a lot of output from wget and sadly no clear conclusion notice
-```
-
-Use the supplied script to download and unpack the latest bootstrap into the default data directory. Watch for and fix any occuring errors until you can be sure you successfully got, checksum-verified and unpacked the latest bootstrap into the default Verus data directory location.
-
-```bash
-fetch-bootstrap
-# ... some output
-Enter blockchain data directory or leave blank for default:<return>
-Install bootstrap in /home/verus/.komodo/VRSC? ([1]Yes/[2]No)<1><return>
-# ... some more output, then, ideally
-Bootstrap successfully installed
-```
-
-Now, let's create the data and wallet export directory. Then, get the bootstrap and unpack it there.
+Now, let's create the wallet export directory.
 
 ```bash
 mkdir ~/export
@@ -72,7 +67,7 @@ It's time to do the wallet config. A reasonably secure `rpcpassword` can be gene
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
 ```
 
-Create `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
+Edit `~/.komodo/VRSC/VRSC.conf` and include the parameters listed below, adapt the ones that need adaption.
 
 ```conf
 ##
@@ -134,6 +129,8 @@ checklevel=4
 # wallet related
 exportdir=/home/verus/export
 spendzeroconfchange=0
+minetolocalwallet=0
+#mineraddress=
 
 # blocknotify
 #blocknotify=
@@ -169,7 +166,7 @@ addnode=65.21.63.161:27485
 # EOF
 ```
 
-Afterwards, start the verus daemon and let it sync the rest of the blockchain. We'll also watch the debug log for a moment:
+Afterwards, restart the verus daemon and let it sync the rest of the blockchain. We'll also watch the debug log for a moment:
 
 ```bash
 cd ~/.komodo/VRSC; verusd -daemon 1>/dev/null 2>&1; sleep 1; tail -f debug.log
@@ -186,17 +183,61 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 ```crontab
 @reboot cd /home/verus/.komodo/VRSC; /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
 ```
-
 **HINT:** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
 
-## Redis
+Create a `start-daemon` script:
+```bash
+cat << EOX >> /home/verus/bin/start-daemon
+#!/bin/bash
+cd /home/verus/.komodo/VRSC; /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
+# EOF
+EOX
+chmod +x /home/verus/bin/start-daemon
+```
+create a restart script `/home/verus/bin/restart-daemon`:
+```bash
+#!/bin/bash
 
-Switch back to the `root` account by typing `exit` or hitting `ctrl-d`. In your `/etc/redis/redis.conf` file, make sure it contains this (and none of it is commented out):
+#Copyright Alex English April 2021
+#This script comes with no warranty whatsoever. Use at your own risk.
+
+#This script just blocks execution until verusd exits. Use it for performing actions in a script after intentionally stopping verusd, or use for alarming if verusd fails, etc.
+#If there are multiple instances of verusd running, this will not detect any of them going down, it will only exit when there are NO running instances of verusd
+
+#passing any argument will make it run in verbose mode, telling you each time it checks
+
+/home/verus/bin/verus stop
+
+while ps -u "verus" x | grep "/home/verus/bin/verusd" | grep -v "grep"; do
+    sleep 2s
+done
+
+count=$(/home/verus/bin/verus getconnectioncount)
+case $count in
+    ''|*[!0-9]*) dstat=0 ;;
+    *) dstat=1 ;;
+esac
+if [[ "$dstat" == "0" ]]; then
+        cd /home/verus/.komodo/VRSC && /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
+fi
+#EOF
+```
+and make it an executable:
+```bash
+chmod +x /home/verus/bin/restart-daemon
+```
+
+
+## Keydb
+
+Switch back to the `root` account by typing `exit` or hitting `ctrl-d`. In your `/etc/keydb/keydb.conf` file, make sure it contains this (and none of it is commented out):
 
 ```conf
-unixsocket /var/run/redis/redis.sock
+bind * -::*
+protected-mode no
+port 6379
+unixsocket /var/run/keydb/keydb.sock
 unixsocketperm 775
-bind 127.0.0.1
 appendonly yes
 ```
 
@@ -209,7 +250,7 @@ And use the following command to activate it immediately
 ```bash
 sysctl net.core.somaxconn=1024
 ```
-**NOTE:** Be aware that you may have to install the POSIX module (as pool user in the `~/s-nomp` directory: `npm install posix`)
+**NOTE:** Be aware that you may have to install the POSIX module for numbers above 1024 (as pool user in the `~/s-nomp` directory: `npm install posix`). Check the pool log as soon as you start up. It will tell you if you need it.
 
 
 Set the overcommit_memory feature to 1, to avoid loss of data in case of not enough memory:
@@ -232,14 +273,14 @@ GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT transparent_hugepage=nev
 Update `GRUB` and reboot.
 ```bash
 update-grub
-shutdown -r now
+reboot now
 ```
 
-Wait for the reboot to finish and log back in as `root`. Set `redis-server` to start at bootup and start it manually:
+Wait for the reboot to finish and log back in as `root`. Set `keydb-server` to start at bootup and start it manually:
 
 ```bash
-update-rc.d redis-server enable
-/etc/init.d/redis-server start
+systemctl enable keydb-server
+systemctl start keydb-server
 ```
 
 ## Node.js
@@ -249,8 +290,8 @@ Create a new user account to run the pool from. Switch to that user to setup `nv
 
 ```bash
 useradd -m -d /home/pool -s /bin/bash pool
-usermod -g pool redis
-chown -R redis:pool /var/run/redis
+usermod -a -g keydb pool
+chown -R keydb:pool /var/run/keydb
 su - pool
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
 ```
@@ -262,26 +303,26 @@ exit
 su - pool
 ```
 
-Now, install `NodeJS v8` via `nvm.sh` as well as `redis-commander` and [PM2](http://pm2.keymetrics.io) via `npm`.   
+Now, install `NodeJS v8` via `nvm.sh` as well as [PM2](http://pm2.keymetrics.io) via `npm`.   
 **NOTE:** Node v10 or higher won't work. You _will_ have to use Node v8!
 **NOTE:** PM2 v5.0.0 or higher won't work. You _will_ have to use PM2 v4.5.6!
 
 ```bash
 nvm install 8
-npm install -g redis-commander pm2@4.5.6
+npm install -g pm2@4.5.6
 ```
 
 Because `nvm.sh` comes without it, we need to add one symlink into its bindir for our installed NodeJS.
 
 ```bash
 which node
-/home/pool/.nvm/versions/node/v8.16.2/bin/node
+/home/pool/.nvm/versions/node/v8.17.0/bin/node
 ```
 
 Change to the resulting directory and create a symlink like below.
 
 ```bash
-cd /home/pool/.nvm/versions/node/v8.16.2/bin
+cd /home/pool/.nvm/versions/node/v8.17.0/bin
 ln -s node nodejs
 exit
 ```
@@ -305,7 +346,7 @@ npm install
 
 ## Configuration Instructions
 
-Shielding is no longer required for mined Verus coins. We will need two public addresses for this. Switch to the `veruscoin` user and generate the addresses:
+Shielding is no longer required for mined Verus coins. We will need two public addresses for this. Switch to the `verus` user and generate the addresses:
 
 ```bash
 verus getnewaddress
@@ -324,9 +365,9 @@ verus dumpprivkey <Verus T-address 2>
 Now, switch to the `pool` account. First, copy `/home/pool/s-nomp/config_example.json` to `/home/pool/s-nomp/config.json`. Edit it to reflect the changes listed below.
 
   * Set both `host` and `stratumHost` to the external IP or DNS name of your server.
-  * Enable UNIX socket connections by setting `"socket": "/var/run/redis/redis.sock",`, `"password": ""` and removing the rest of the lines in the `"redis"` section
+  * Enable UNIX socket connections by setting `"socket": "/var/run/keydb/keydb.sock",`, `"password": ""` and removing the rest of the lines in the `"redis"` sections. **Do NOT rename the `redis` section names themselvews!!!**
 
-Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.json` to `/home/pool/s-nomp/pool_configs/vrsc.json`. Edit it to reflect the changes listed below.
+Now create a pool config. Copy `/home/pool/s-nomp/pool_configs/examples/vrsc.json` to `/home/pool/s-nomp/pool_configs/verus.json`. Edit it to reflect the changes listed below.
 
  * Set `enabled` to `true`.
  * Set `coin` to `vrsc.json`.
@@ -359,14 +400,21 @@ To determine the location of your `node` binary, switch to user `pool`, do this 
 
 ```bash
 which node
-/home/pool/.nvm/versions/node/v8.16.1/bin/node
+/home/pool/.nvm/versions/node/v8.17.0/bin/node
 ```
 
 Switch back to user `verus` and edit `~/.komodo/VRSC/VRSC.conf` to enable the blocknotify command as seen below, using the location you just got from using `which node` before:
 
 ```conf
-blocknotify=/home/pool/.nvm/versions/node/v8.16.1/bin/node /home/pool/s-nomp/scripts/cli.js blocknotify verus %s
+blocknotify=/home/pool/.nvm/versions/node/v8.17.0/bin/node /home/pool/s-nomp/scripts/cli.js blocknotify verus %s
 ```
+
+*Alternative to running the blocknotify script through node*:
+Compile (on any other machine) the `/home/pool/s-nomp/scripts/blocknotify.c` code, copy the binary to `/home/pool/s-nomp/scripts/blocknotify`, make executable using `chmod +x /home/pool/s-nomp/scripts/blocknotify` and use this line in your `VRSC.conf`:
+```conf
+blocknotify=/home/pool/s-nomp/scripts/blocknotify 127.0.0.1:17117 verus %s
+```
+This configuration will shave of milliseconds off the time it takes your pool to be notified.
 
 Restart the wallet using the command already listed above. If you are not using `STDOUT`/`STDERR`-redirection, you will see errors about blocknotify. These are expected, because the pool is not running yet and thus the blocknotify script cannot complete successfully.
 
@@ -375,7 +423,7 @@ Switch to the `pool` user. Then start the pool using `pm2`:
 
 ```bash
 cd ~/s-nomp
-pm2 start init.js --name veruspool
+pm2 start init.js --name pool
 ```
 
 Use `pm2 log` to check for S-NOMP startup errors.
@@ -387,7 +435,7 @@ If you completed all steps correctly, the web dashboard on your pool can be reac
 Edit your crontab using `crontab -e` and shove in this line at the bottom:
 
 ```crontab
-@reboot /bin/sleep 300 && cd /home/pool/s-nomp && /usr/bin/pm2 start init.js --name veruspool
+@reboot /bin/sleep 300 && cd /home/pool/s-nomp && /home/pool/.nvm/versions/node/v8.17.0/bin/pm2 start init.js --name pool
 ```
 
 **HINT:** if you can't stand `vi`, do `EDITOR=nano crontab -e` ;-)
@@ -396,6 +444,26 @@ Edit your crontab using `crontab -e` and shove in this line at the bottom:
 ## Further considerations
 
 None of the topics below is strictly necessary, but most of them are recommended.
+
+### Enabling firewall
+
+As `root` user:
+```bash
+ufw allow from any to any port 22 comment "SSH access"
+```
+If you want to limit the IPs that can access your server over SSH (eg, if you have a fixed IP address or use a SSH-jump server) replace the first `any` with the IP or ip-range. doublecheck this or you will lock yourself out!
+```bash
+ufw allow from any to any port 80,443 comment "Standard web ports"
+ufw allow from any to any port 9999 comment "mining port(s)"
+```
+add multiple mining ports by separating them by commas, analogue to the web ports.
+```bash
+ufw enable
+```
+If you are also installing a separate `stratum server`, it will need a connection to the `keydb` database:
+```bash
+ufw allow from <stratum-ip> to any port 6379 comment "Stratum server database connection"
+```
 
 ### Useful DNS resolvers
 
@@ -436,7 +504,6 @@ nameserver 2620:119:53::53
 options rotate timeout:1 attempts:5
 ```
 
-Thank you.
 
 ### Improving SSH security
 
@@ -472,7 +539,7 @@ As `root`, install `nginx` and enable it on boot using these commands:
 
 ```bash
 apt -y install nginx
-update-rc.d enable nginx
+systemctl enable nginx
 ```
 
 Create `/etc/nginx/blockuseragents.rules` with these contents:
@@ -521,7 +588,7 @@ server {
 Restart `nginx`:
 
 ```bash
-/etc/init.d/nginx restart
+systemctl restart nginx
 ```
 
 Switch to the `pool` user, edit `/home/pool/s-nomp/config.json` to bind the web interface to `127.0.0.1:8080`:
@@ -546,7 +613,7 @@ If you've followed the above steps correctly, your pool's webdashboard is now pr
 
 ### Disable unused webdashboard pages
 
-Change to the `pool` account. Edit `/home/pool/libs/website.js` to have the `pageFiles` array look like below:
+Change to the `pool` account. Edit `/home/pool/s-nomp/libs/website.js` to have the `pageFiles` array look like below:
 
 ```conf
 var pageFiles = {
@@ -564,7 +631,7 @@ var pageFiles = {
 
 ### Link to the `payments` page
 
-Change to the `pool` user account. Edit `/home/pool/website/index.html` to include a new link at the right position, which is somewhere in between lines `30-70`:
+Change to the `pool` user account. Edit `/home/pool/s-nomp/website/index.html` to include a new link at the right position, which is somewhere in between lines `30-70`:
 
 ```html
 <header>
@@ -581,12 +648,12 @@ Change to the `pool` user account. Edit `/home/pool/website/index.html` to inclu
 
 ### Enable `logrotate`
 
-As `root` user, create a file called `/etc/logrotate.d/veruspool` with these contents:
+As `root` user, create a file called `/etc/logrotate.d/pool` with these contents:
 
 ```conf
 /home/verus/.komodo/VRSC/debug.log
-/home/pool/.pm2/logs/veruspool-out.log
-/home/pool/.pm2/logs/veruspool-error.log
+/home/pool/.pm2/logs/pool-out.log
+/home/pool/.pm2/logs/pool-error.log
 {
   rotate 14
   daily

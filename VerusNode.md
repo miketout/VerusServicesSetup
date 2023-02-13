@@ -2,7 +2,7 @@
 
 ## Server
 
-A VPS with 2GB of RAM, anything above 30GB SSD storage and 2 CPU cores that are able to handle AES-NI is the absolute minimum requirement. Start following the guide while logged in as `root`.
+A VPS with 4GB of RAM, anything above 50GB SSD storage and 2 CPU cores that are able to handle AES-NI is the absolute minimum requirement. Start following the guide while logged in as `root`.
 
 
 ## Operating System
@@ -28,8 +28,8 @@ apt -y install build-essential git pkg-config libc6-dev m4 g++-multilib autoconf
 Create a useraccount for the wallet. Switch to that account.
 
 ```
-useradd -m -d /home/veruscoin -s /bin/bash veruscoin
-su - veruscoin
+useradd -m -d /home/verus -s /bin/bash verus
+su - verus
 ```
 
 Now, clone the source tree and build the binaries:
@@ -102,13 +102,50 @@ banscore=25
 # stake if possible, although it's probably not helping much
 mint=1
 
-# addnodes
-seednode=185.25.48.236:27485
-addnode=185.25.48.236:27487
-seednode=185.64.105.111:27485
-addnode=185.64.105.111:27487
-seednode=185.25.48.72:27485
-seednode=185.25.48.72:27487
+# seednodes
+seednode=66.228.59.168:27485
+seednode=172.104.48.148:27485
+seednode=45.79.237.198:27485
+seednode=45.79.111.201:27485
+seednode=95.217.1.76:27485
+seednode=157.90.155.113:27485
+seednode=157.90.113.198:27485
+seednode=95.216.104.210:27487
+
+# addnodes (Insight explorers)
+addnode=157.90.127.142:27485
+addnode=157.90.248.145:27485
+addnode=135.181.253.217:27485
+
+# addnodes (Iquidus explorers)
+addnode=95.216.104.214:27485
+addnode=135.181.68.6:27485
+addnode=168.119.27.246:27485
+
+# addnodes (ElectrumX servers)
+addnode=168.119.166.240:27485
+addnode=157.90.155.8:27485
+addnode=65.21.63.161:27485
+
+# addnodes (pools)
+## Oink#3612 / pool.veruscoin.io
+addnode=136.243.227.137:27485
+addnode=162.55.8.164:27485
+## Dudezmobi Staking Pool
+addnode=152.32.95.164:27485
+## Quipacorn#5205 / verus.farm
+addnode=82.59.55.162:27485
+## Uncharted#3880 / verus.aninterestinghole.xyz
+addnode=136.56.61.241:27485
+## / verus.quick-pool.io
+addnode=164.128.166.226:27485
+## / verus.wattpool.net
+addnode=144.217.83.45:27485
+## CiscoTech#7806 / vrsc.ciscotech.dk
+addnode=188.183.103.90:27485
+## Quipacorn#5205 / verus.farm
+addnode=162.55.59.82:27485
+
 ```
 
 Afterwards, start the daemon again and let it sync the blockchain:
@@ -127,7 +164,7 @@ When it has synced up to height, the `blocks` and `longestchain` values will be 
 
 ## Configuration Instructions
 
-Shielding is required for mined / staked VerusCoins. We will need a public and a z-address for this. Switch to the `veruscoin` user and generate the addresses:
+Shielding is no longer required for mined / staked VerusCoins. We will need a public but don't need a z-address, but make one anyway for this. Switch to the `verus` user and generate the addresses:
 
 ```
 verus getnewaddress
@@ -181,42 +218,10 @@ To finish, restart the ssh server:
 
 ### Autostart using `cron`
 
-Switch to the `veruscoin` user. Edit the `crontab` using `crontab -e` and include the lines below:
+Switch to the `verus` user. Edit the `crontab` using `crontab -e` and include the lines below:
 
 ```
-@reboot /home/veruscoin/bin/verusd -daemon 1>/dev/null 2>&1
-```
-
-### Simplify wallet usage
-
-Switch to the `veruscoin` user. Create a file called `/home/veruscoin/bin/veruscoind` that looks like this:
-
-```
-#!/bin/bash
-OLDPWD="$(pwd)"
-cd /home/veruscoin/.komodo/VRSC
-/home/veruscoin/bin/verusd ${@}
-cd "${OLDPWD}"
-```
-
-Create another file called `/home/veruscoin/bin/veruscoin-cli` that looks like this:
-
-```
-#!/bin/bash
-/home/veruscoin/bin/verus ${@}
-```
-
-Make both files executable:
-
-```
-chmod +x /home/veruscoin/bin/veruscoin*
-```
-
-From now on, any time you would have to use the huge `komodod` or `komodo-cli` commands (both these commands are deprecated), you can just use them as shown below:
-
-```
-veruscoind -daemon 1>/dev/null 2>&1
-veruscoin-cli addnode 1.2.3.4 onetry
+@reboot /home/verus/bin/verusd -daemon 1>/dev/null 2>&1
 ```
 
 ### Increase open files limit
@@ -233,7 +238,7 @@ Reboot to activate the changes. Alternatively you can make sure all running proc
 
 ### Change swapping behaviour
 
-If your system has a lot of RAM, you can change the swapping behaviour to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting:
+If your system has a lot of RAM, you can change the swapping behavior to only swap when necessary. Edit `/etc/sysctl.conf` to include this setting:
 
 ```
 vm.swappiness=1
@@ -254,3 +259,15 @@ apt -y install molly-guard
 ```
 
 Check `/etc/molly-guard/rc` for more options.
+
+### Enable `ufw` firewall
+First setup the required ports for access.
+If you configured your SSH access to another port (not a bad idea), change the port accordingly.
+If you don't need SSH access, don't run the `SSH port` line.
+If you do not want your node to accept incoming connections, do not run the `Verus P2P port` line.
+```bash
+ufw allow from any to any port 22 comment "SSH port"
+ufw allow from any to any port 27485 proto tcp comment "Verus P2P port"
+ufw enable
+```
+If you are connected through a SSH connection, do not disconnect until you have verified with a new connection that you can still make a connection to your node.
